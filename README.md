@@ -24,4 +24,4 @@ directly from the command line. It makes life that little bit less painful.
 
 Run the following command from within the audiojs folder.
 
-    mxmlc mp3player.as
+    mxmlc audiojs.as

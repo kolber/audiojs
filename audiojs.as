@@ -11,7 +11,7 @@ import flash.events.TimerEvent;
 import flash.utils.Timer;
 import flash.system.Security;
 
-public class mp3player extends Sprite {
+public class audiojs extends Sprite {
 
   private var _channel:SoundChannel;
   private var sound:Sound;
@@ -31,7 +31,7 @@ public class mp3player extends Sprite {
     this._channel.addEventListener(Event.SOUND_COMPLETE, this.sound_ended);
   }
 
-  public function mp3player():void {
+  public function audiojs():void {
     Security.allowDomain("*");
 
     ExternalInterface.addCallback("load_mp3", load_mp3);
