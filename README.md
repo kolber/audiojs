@@ -2,6 +2,15 @@
 
 ## Usage
 
+Include audio.js:
+    <script src="./audio.js"></script>
+
+HTML:
+    <audio id="audio_tag2" preload="auto" autobuffer>
+      <source src="./juicy.mp3">
+    </audio>
+
+Javascript:
     audioJS.events.ready(function() {
       var as = audioJS.create_all();
     });
