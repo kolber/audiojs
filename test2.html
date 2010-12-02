@@ -16,7 +16,7 @@
       .audiojsZ .timeZ strong { font-weight: normal; }
 
       .audiojs { font-family: monospace; }
-      .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #fcc; color: #f00; border: 1px solid #eee; font-size: 8px; float: left; margin: 0px 0px 10px; }
+      .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #fcc; color: #f00; border: 1px solid #fcc; font-size: 8px; float: left; margin: 0px 0px 10px; }
       .audiojs .play_pause p { width: 20px; margin: 0px; font-family: sans-serif; }
       .audiojs .scrubber { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #fcc; padding-left: 5px; line-height: 20px; white-space: nowrap; }
       .audiojs .progress { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #f99; }
@@ -25,13 +25,21 @@
       .audiojs .time em { font-style: normal; color: #f99; }
       .audiojs .time strong { font-weight: normal; }
 
+      .audiojs { font-family: monospace; }
+      .audiojs .play_pauseZZ { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #ccf; color: #00f; border: 1px solid #ccf; font-size: 8px; float: left; margin: 0px 0px 10px; }
+      .audiojs .play_pauseZZ p { width: 20px; margin: 0px; font-family: sans-serif; }
+      .audiojs .scrubberZZ { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #ccf; padding-left: 5px; line-height: 20px; white-space: nowrap; }
+      .audiojs .progressZZ { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #99f; }
+      .audiojs .loadedZZ { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #ccf; }
+      .audiojs .timeZZ { float: left; color: #00f; margin: 3px 0px 0px 10px; }
+      .audiojs .timeZZ em { font-style: normal; color: #99f; }
+      .audiojs .timeZZ strong { font-weight: normal; }
+
     </style>
     <script src="./audio.js"></script>
     <script>
       audioJS.events.ready(function() {
         var audios = document.getElementsByTagName('audio');
-
-        var a2 = audioJS.create(audios[1]);
 
         var a1 = audioJS.create(audios[0], {
           create_player: {
@@ -47,16 +55,33 @@
           }
         });
 
+        var a2 = audioJS.create(audios[1]);
+
+        var a3 = audioJS.create(audios[2], {
+          create_player: {
+            markup: '<div class="play_pauseZZ"><p class="pauseZZ">❙ ❙</p><p class="playZZ">▶</p></div><div class="scrubberZZ"><div class="progressZZ"></div><div class="loadedZZ"></div></div><div class="timeZZ"><em class="playedZZ">00:00</em>/<strong class="durationZZ">00:00</strong></div>',
+            play_pause_class: 'play_pauseZZ',
+            play_class: 'playZZ',
+            pause_class: 'pauseZZ',
+            scrubber_class: 'scrubberZZ',
+            progress_class: 'progressZZ',
+            loader_class: 'loadedZZ',
+            time_class: 'timeZZ',
+            duration_class: 'durationZZ',
+            played_class: 'playedZZ'
+          }
+        });
+
       });
     </script>
   </head>
   <body>
-    <h1>audioJS.create()</h1>
+    <h1>audioJS.create(element, settings)</h1>
     <p>Manual player markup</p>
 
     <div class="audiojsZ">
       <audio id="audio_tag" preload="auto" autobuffer>
-        <source src="http://cdn02.cdn.gorillavsbear.net/wp-content/uploads/2010/11/gorilla-vs.-bear-november-2010.mp3">
+        <source src="./juicy.mp3">
       </audio>
       <div class="play_pauseZ">
         <p class="pauseZ">❙ ❙</p>
@@ -71,11 +96,17 @@
       </div>
     </div>
 
-
     <p>Automatic player markup</p>
     <audio id="audio_tag2" preload="auto" autobuffer>
       <source src="./juicy.mp3">
     </audio>
+
+    <p>Manual player markup (passed)</p>
+    <audio id="audio_tag2" preload="auto" autobuffer>
+      <source src="./juicy.mp3">
+    </audio>
+
+  </div>
 
   </body>
 </html>
