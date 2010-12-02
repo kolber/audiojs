@@ -20,9 +20,33 @@
 
   */
 
+  // Use Dustin Diaz's getElementsByClassName method
+  var get_by_class = function(searchClass, node, tag) {
+
+    var matches = [],
+        node = node || document,
+        tag = tag || '*',
+        els = node.getElementsByTagName(tag),
+        pattern = new RegExp("(^|\\s)"+searchClass+"(\\s|$)");
+
+    if (document.getElementsByClassName) {
+      matches = node.getElementsByClassName(searchClass);
+    } else {
+      for (i = 0, j = 0, l = els.length; i < l; i++) {
+        if (pattern.test(els[i].className)) {
+          matches[j] = els[i];
+          j++;
+        }
+      }
+    }
+
+    return matches.length > 1 ? matches : matches[0];
+  }
+
+
   container[audioJS_instance] = function(settings) {
 
-    var source = this.getElementsByTagName('source')[0]
+    var source = this.getElementsByTagName('source')[0];
 
     return {
       element: this,
@@ -110,7 +134,7 @@
   container[audioJS] = {
 
     instance_count: 0,
-    instances: [],
+    instances: {},
 
     default_css: '\
       .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 20px; text-align: center; background: #eee; color: #666; font-size: 10px; float: left; margin: 0px 0px 10px; } \
@@ -140,10 +164,16 @@
       })(),
 
       create_player: {
-        markup: '<div class="play_pause"><p>❙ ❙</p><p>▶</p></div><div class="scrubber"><div class="played"></div><div class="loaded"></div></div><div class="duration"><em>00:00</em>/<strong>00:00</strong></div>',
+        markup: '<div class="play_pause"><p class="pause">❙ ❙</p><p class="play">▶</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div>',
         play_pause_class: 'play_pause',
-        scrubber_class: 'played',
-        loaded_percent_class: 'loaded'
+        play_class: 'play',
+        pause_class: 'pause',
+        scrubber_class: 'scrubber',
+        progress_class: 'progress',
+        loader_class: 'loaded',
+        time_class: 'time',
+        duration_class: 'duration',
+        played_class: 'played'
       },
 
       track_ended: function() {
@@ -151,9 +181,11 @@
       },
 
       load_error: function(e) {
-        var scrubber = this.wrapper.getElementsByTagName('div')[1],
-            duration = this.wrapper.getElementsByTagName('div')[4],
-            play_pause = this.wrapper.getElementsByTagName('div')[0];
+        var player = this.settings.create_player,
+            scrubber = get_by_class(player.scrubber_class, this.wrapper),
+            duration = get_by_class(player.time_class, this.wrapper),
+            play_pause = get_by_class(player.play_pause_class, this.wrapper);
+
         this.wrapper.style.clear = 'both';
         duration.style.display = 'none';
         play_pause.style.display = 'none';
@@ -161,9 +193,8 @@
       },
 
       load_started: function() {
-
-        var wrapper = this.wrapper.getElementsByTagName('div')[4],
-            duration = wrapper.getElementsByTagName('strong')[0],
+        var player = this.settings.create_player,
+            duration = get_by_class(player.duration_class, this.wrapper),
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
 
@@ -171,10 +202,11 @@
       },
 
       load_progress: function(loaded_percent) {
-        var wrapper = this.wrapper.getElementsByTagName('div')[1],
-            loaded = wrapper.getElementsByTagName('div')[1];
+        var player = this.settings.create_player,
+            scrubber = get_by_class(player.scrubber_class, this.wrapper),
+            loaded = get_by_class(player.loader_class, this.wrapper);
 
-        loaded.style.width = (wrapper.offsetWidth * loaded_percent) + 'px';
+        loaded.style.width = (scrubber.offsetWidth * loaded_percent) + 'px';
       },
 
       play_pause: function() {
@@ -183,24 +215,27 @@
       },
 
       play: function() {
-        var wrapper = this.wrapper.getElementsByTagName('div')[0];
-        wrapper.getElementsByTagName('p')[0].style.display = 'block';
-        wrapper.getElementsByTagName('p')[1].style.display = 'none';
+        var player = this.settings.create_player;
+
+        get_by_class(player.play_class, this.wrapper).style.display = 'none';
+        get_by_class(player.pause_class, this.wrapper).style.display = 'block';
       },
 
       pause: function() {
-        var wrapper = this.wrapper.getElementsByTagName('div')[0];
-        wrapper.getElementsByTagName('p')[0].style.display = 'none';
-        wrapper.getElementsByTagName('p')[1].style.display = 'block';
+        var player = this.settings.create_player;
+
+        get_by_class(player.play_class, this.wrapper).style.display = 'block';
+        get_by_class(player.pause_class, this.wrapper).style.display = 'none';
       },
 
       update_playhead: function(percent_played) {
-        var wrapper = this.wrapper.getElementsByTagName('div')[1],
-            playhead = wrapper.getElementsByTagName('div')[0];
-        playhead.style.width = (wrapper.offsetWidth * percent_played) + 'px';
+        var player = this.settings.create_player,
+            scrubber = get_by_class(player.scrubber_class, this.wrapper),
+            progress = get_by_class(player.progress_class, this.wrapper);
 
-        var wrapper = this.wrapper.getElementsByTagName('div')[4],
-            played = wrapper.getElementsByTagName('em')[0]
+        progress.style.width = (scrubber.offsetWidth * percent_played) + 'px';
+
+        var played = get_by_class(player.played_class, this.wrapper),
             p = this.duration * percent_played,
             m = Math.floor(p / 60),
             s = Math.floor(p % 60);
@@ -291,6 +326,7 @@
     },
 
     create: function(element, options) {
+      var options = options || {}
       // return single audioJS instance
       return this.new_instance(element, options);
     },
@@ -324,8 +360,9 @@
 
     attach_events: function(wrapper, audio_instance) {
       // Handle play/pause click
-      var play_pause = wrapper.getElementsByTagName('div')[0],
-          scrubber = wrapper.getElementsByTagName('div')[1],
+      var player = audio_instance.settings.create_player,
+          play_pause = get_by_class(player.play_pause_class, wrapper),
+          scrubber = get_by_class(player.scrubber_class, wrapper),
           left_pos = function(elem) {
             var curleft = 0;
             if (elem.offsetParent) {
@@ -390,8 +427,10 @@
 
       this.instance_count++;
 
-      if (s.create_player) {
+      if (s.create_player.markup) {
         element = this.create_player(element, s.create_player);
+      } else {
+        element.parentNode.setAttribute('id', 'audiojs_'+this.instance_count);
       }
 
       // return new audioJS instance
