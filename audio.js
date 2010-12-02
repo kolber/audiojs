@@ -254,6 +254,13 @@
         }
       },
 
+      clone: function(obj){
+        if(obj == null || typeof(obj) != 'object') return obj;
+        var temp = new obj.constructor();
+        for(var key in obj) temp[key] = arguments.callee(obj[key]);
+        return temp;
+      },
+
       get_swf: function(name) {
         var swf = document[name] || window[name];
         return swf.length > 1 ? swf[swf.length - 1] : swf;
@@ -372,7 +379,7 @@
           };
 
       container[audioJS].events.add_listener(play_pause, 'click', function(e) {
-        audio_instance.play_pause();
+        audio_instance.play_pause.apply(audio_instance);
       });
 
       container[audioJS].events.add_listener(scrubber, 'click', function(e) {
@@ -422,7 +429,7 @@
     },
 
     new_instance: function(element, options) {
-      var s = this.settings;
+      var s = this.helpers.clone(this.settings);
       if (options) this.helpers.merge(s, options);
 
       this.instance_count++;
