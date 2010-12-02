@@ -462,13 +462,15 @@
 
         // attach flash-specfic events
         this.attach_flash_events(new_audio.wrapper, new_audio);
+        this.attach_events(new_audio.wrapper, new_audio);
 
       } else {
+
+        this.attach_events(new_audio.wrapper, new_audio);
+
         if (s.autoplay) new_audio.play();
         else new_audio.pause();
       }
-
-      if (s.create_player) this.attach_events(new_audio.wrapper, new_audio);
 
       return new_audio;
     }
