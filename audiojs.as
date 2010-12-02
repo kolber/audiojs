@@ -6,6 +6,8 @@ import flash.net.URLRequest;
 import flash.media.Sound;
 import flash.media.SoundChannel;
 import flash.events.Event;
+import flash.errors.IOError;
+import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
 import flash.events.TimerEvent;
 import flash.utils.Timer;
@@ -16,6 +18,7 @@ public class audiojs extends Sprite {
   private var _channel:SoundChannel;
   private var sound:Sound;
   private var duration:Number;
+  private var player_instance:String;
 
   private var pause_point:Number = 0;
   private var playing:Boolean = false;
@@ -34,19 +37,23 @@ public class audiojs extends Sprite {
   public function audiojs():void {
     Security.allowDomain("*");
 
-    ExternalInterface.addCallback("load_mp3", load_mp3);
-    ExternalInterface.addCallback("play_pause", play_pause);
-    ExternalInterface.addCallback("skip_to", skip_to);
+    this.player_instance = root.loaderInfo.parameters.player_instance+'.';
+
+    ExternalInterface.addCallback('load', load);
+    ExternalInterface.addCallback('play_pause', play_pause);
+    ExternalInterface.addCallback('play', play);
+    ExternalInterface.addCallback('pause', pause);
+    ExternalInterface.addCallback('skip_to', skip_to);
 
     var load_callback:String = root.loaderInfo.parameters.load_callback;
-    ExternalInterface.call(load_callback);
+    ExternalInterface.call(this.player_instance+load_callback);
   }
 
   private function update_playhead(e:TimerEvent = null):void {
     var target_position:Number = e ? this.channel.position : this.pause_point;
     var play_progress:Number = target_position / this.duration;
     if(play_progress > 0) {
-      ExternalInterface.call('update_playhead', play_progress);
+      ExternalInterface.call(this.player_instance+'update_playhead', play_progress);
     }
   }
 
@@ -55,30 +62,43 @@ public class audiojs extends Sprite {
 
     var load_percent:Number = e.bytesLoaded / e.bytesTotal;
     if(load_percent > 0) {
-      ExternalInterface.call('update_load_progress', load_percent);
+      ExternalInterface.call(this.player_instance+'load_progress', load_percent, (this.duration/1000));
     }
   }
 
-  private function load_mp3(mp3_url:String):void {
+  private function load(mp3_url:String):void {
     this.channel = new SoundChannel();
     this.sound = new Sound(new URLRequest(mp3_url));
 
+    sound.addEventListener(IOErrorEvent.IO_ERROR, this.load_error);
     sound.addEventListener(ProgressEvent.PROGRESS, this.load_progress);
 
     this.timer.addEventListener(TimerEvent.TIMER, this.update_playhead);
     this.timer.start();
   }
 
+  private function load_error(e:IOErrorEvent):void {
+    ExternalInterface.call(this.player_instance+'load_error');
+  }
+
+  private function play():void {
+    this.channel = this.sound.play(this.pause_point);
+		this.playing = true;
+		this.timer.start();
+  }
+
+  private function pause():void {
+    this.pause_point = this.channel.position;
+    this.channel.stop();
+    this.playing = false;
+    this.timer.stop();
+  }
+
   private function play_pause():void {
     if (this.playing) {
-      this.pause_point = this.channel.position;
-      this.channel.stop();
-      this.playing = false;
-      this.timer.stop();
+      this.pause();
     } else {
-      this.channel = this.sound.play(this.pause_point);
-  		this.playing = true;
-  		this.timer.start();
+      this.play();
     }
   }
 
@@ -94,8 +114,8 @@ public class audiojs extends Sprite {
 
   private function sound_ended(e:Event):void {
     this.timer.stop();
-    ExternalInterface.call('update_playhead', 1);
-    ExternalInterface.call('logg', 'sound ended.');
+    ExternalInterface.call(this.player_instance+'update_playhead', 1);
+    ExternalInterface.call(this.player_instance+'track_ended');
   }
 
 }
