@@ -96,6 +96,7 @@
 
           var duration_loaded = this.element.buffered.end(this.element.buffered.length - 1);
           this.loaded_percent = duration_loaded / this.duration;
+
           this.settings.load_progress.apply(this, [this.loaded_percent]);
         }
       },
@@ -389,9 +390,16 @@
 
       if(audio_instance.settings.use_flash) return;
 
-      container[audioJS].events.add_listener(audio_instance.element, 'progress', function(e) {
-        audio_instance.load_progress.apply(audio_instance);
-      });
+      var timer = setInterval(function() {
+        if(audio_instance.element.readyState > 0) {
+          clearInterval(timer);
+          var timer2 = setInterval(function() {
+            audio_instance.load_progress.apply(audio_instance);
+            if(audio_instance.loaded_percent >= 1) clearInterval(timer2);
+          });
+
+        }
+      }, 10);
 
       container[audioJS].events.add_listener(audio_instance.element, 'timeupdate', function(e) {
         audio_instance.update_playhead.apply(audio_instance);
@@ -402,6 +410,7 @@
       });
 
       container[audioJS].events.add_listener(audio_instance.source, 'error', function(e) {
+        clearInterval(timer);
         audio_instance.settings.load_error.apply(audio_instance);
       });
 
@@ -411,6 +420,7 @@
 
       // overwrite audio instance methods
       this.helpers.merge(audio_instance, {
+
         load_progress: function(loaded_percent, duration) {
           this.loaded_percent = loaded_percent;
           this.duration = duration;
