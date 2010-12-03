@@ -387,6 +387,8 @@
         audio_instance.skip_to(relative_left / scrubber.offsetWidth);
       });
 
+      if(audio_instance.settings.use_flash) return;
+
       container[audioJS].events.add_listener(audio_instance.element, 'progress', function(e) {
         audio_instance.load_progress.apply(audio_instance);
       });

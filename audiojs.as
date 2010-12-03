@@ -52,6 +52,8 @@ public class audiojs extends Sprite {
   private function update_playhead(e:TimerEvent = null):void {
     var target_position:Number = e ? this.channel.position : this.pause_point;
     var play_progress:Number = target_position / this.duration;
+
+    if(play_progress > 1) play_progress = 1;
     if(play_progress > 0) {
       ExternalInterface.call(this.player_instance+'update_playhead', play_progress);
     }
@@ -59,8 +61,9 @@ public class audiojs extends Sprite {
 
   private function load_progress(e:ProgressEvent):void {
     this.duration = (e.bytesTotal / (e.bytesLoaded / this.sound.length))
-
     var load_percent:Number = e.bytesLoaded / e.bytesTotal;
+
+    if(load_percent > 1) load_percent = 1;
     if(load_percent > 0) {
       ExternalInterface.call(this.player_instance+'load_progress', load_percent, (this.duration/1000));
     }
