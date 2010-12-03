@@ -43,6 +43,7 @@
 
         var a1 = audioJS.create(audios[0], {
           create_player: {
+            markup: false,
             play_pause_class: 'play_pauseZ',
             play_class: 'playZ',
             pause_class: 'pauseZ',
@@ -80,8 +81,8 @@
     <p>Manual player markup</p>
 
     <div class="audiojsZ">
-      <audio id="audio_tag" preload="auto" autobuffer>
-        <source src="./juicy.mp3">
+      <audio id="audio_tag1" preload="auto" autobuffer>
+        <source src="./juicy1.mp3">
       </audio>
       <div class="play_pauseZ">
         <p class="pauseZ">❙ ❙</p>
@@ -98,15 +99,13 @@
 
     <p>Automatic player markup</p>
     <audio id="audio_tag2" preload="auto" autobuffer>
-      <source src="./juicy.mp3">
+      <source src="./juicy2.mp3">
     </audio>
 
     <p>Manual player markup (passed)</p>
-    <audio id="audio_tag2" preload="auto" autobuffer>
-      <source src="./juicy.mp3">
+    <audio id="audio_tag3" preload="auto" autobuffer>
+      <source src="./juicy3.mp3">
     </audio>
-
-  </div>
 
   </body>
 </html>
