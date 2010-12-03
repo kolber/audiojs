@@ -2,9 +2,9 @@
 
 
   TODO:
-  - Rather than getElementsByTagName, use class matching
+  - MP3s are requested multiple times?
   - Flash integration cleanup
-  - Use custom css alongside global css
+  - Use javacript-generated css alongside global css
   - Handle jquery elements passed in
 
 */
