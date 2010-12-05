@@ -124,14 +124,13 @@
     // $2 is the path to the swf
     // (+new Date) ensures we always get a fresh copy of the swf (for IE)
     flash_source: '\
-      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="1" height="1" name="$1"> \
-        <param name="movie" value="$2?player_instance='+audioJS+'.instances[\'$1\']&load_callback=load_started"> \
+      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="$1" width="1" height="1" name="$1"> \
+        <param name="movie" value="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime='+(+new Date)+'"> \
         <param name="allowscriptaccess" value="always"> \
-        <embed name="$1" src="$2?player_instance='+audioJS+'.instances[\'$1\']&load_callback=load_started" width="1" height="1" allowscriptaccess="always"> \
+        <embed name="$1" src="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime='+(+new Date)+'" width="1" height="1" allowscriptaccess="always"> \
       </object>',
 
     settings: {
-
       autoplay: false,
       swf_location: './audiojs.swf',
       use_flash: (function() {
@@ -140,7 +139,7 @@
       })(),
 
       create_player: {
-        markup: '<div class="play_pause"><p class="pause">❙ ❙</p><p class="play">▶</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div>',
+        markup: '<div class="play_pause"><p class="pause">PSE</p><p class="play">PLY</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div>',
         play_pause_class: 'play_pause',
         play_class: 'play',
         pause_class: 'pause',
@@ -219,7 +218,18 @@
         for (var key in obj) temp[key] = arguments.callee(obj[key]);
         return temp;
       },
-
+      clone_html5_node: function(audio_tag) {
+        // create a html5-safe document fragment
+        var fragment = document.createDocumentFragment();
+        // enable audio-tag support on the fragment
+        fragment.createElement('audio');
+        var div = fragment.createElement('div');
+        fragment.appendChild(div);
+        // note: outerHTML is not supported by Firefox, so we can't use this everywhere
+        div.innerHTML = audio_tag.outerHTML;
+        // return the audio node
+        return div.firstChild;
+      },
       get_swf: function(name) {
         var swf = document[name] || window[name];
         return swf.length > 1 ? swf[swf.length - 1] : swf;
@@ -311,17 +321,23 @@
       return instances;
     },
 
-    create_player: function(element, player) {
+    create_player: function(element, player, id) {
       // wrap the audio element and append the player markup to that wrapper
       var wrapper = document.createElement('div'),
           element = element;
       wrapper.setAttribute('class', 'audiojs');
-      wrapper.setAttribute('id', 'audiojs_'+this.instance_count);
-      wrapper.appendChild(element.cloneNode(true));
-      wrapper.innerHTML = wrapper.innerHTML + player.markup;
-      element.parentNode.replaceChild(wrapper, element);
-
-      // return wrapped element
+      wrapper.setAttribute('id', id);
+      // Fix IEs broken implementation of innerHTML & broken handling of HTML5 elements
+      if (/MSIE/.test(navigator.userAgent)) {
+        wrapper.innerHTML = player.markup;
+        wrapper.appendChild(this.helpers.clone_html5_node(element));
+        element.outerHTML = wrapper.outerHTML;
+        wrapper = document.getElementById(id);
+      } else {
+        wrapper.appendChild(element.cloneNode(true));
+        wrapper.innerHTML = wrapper.innerHTML + player.markup;
+        element.parentNode.replaceChild(wrapper, element);
+      }
       return wrapper.getElementsByTagName('audio')[0];
     },
 
@@ -341,6 +357,7 @@
       container[audioJS].events.add_listener(play_pause, 'click', function(e) {
         audio_instance.play_pause.apply(audio_instance);
       });
+
       container[audioJS].events.add_listener(scrubber, 'click', function(e) {
         var relative_left = e.clientX - left_pos(this);
         audio_instance.skip_to(relative_left / scrubber.offsetWidth);
@@ -359,12 +376,15 @@
 
         }
       }, 10);
+
       container[audioJS].events.add_listener(audio_instance.element, 'timeupdate', function(e) {
         audio_instance.update_playhead.apply(audio_instance);
       });
+
       container[audioJS].events.add_listener(audio_instance.element, 'ended', function(e) {
         audio_instance.track_ended.apply(audio_instance);
       });
+
       container[audioJS].events.add_listener(audio_instance.source, 'error', function(e) {
         clearInterval(timer);
         audio_instance.settings.load_error.apply(audio_instance);
@@ -373,76 +393,78 @@
     },
 
     attach_flash_events: function(element, audio_instance) {
-
-      // overwrite audio instance methods
-      this.helpers.merge(audio_instance, {
-
-        load_progress: function(loaded_percent, duration) {
-          this.loaded_percent = loaded_percent;
-          this.duration = duration;
-          this.settings.load_started.apply(this);
-          this.settings.load_progress.apply(this, [this.loaded_percent]);
-        },
-
-        skip_to: function(percent) {
-          if (percent > this.loaded_percent) return;
-          this.element.skip_to(percent);
-        },
-
-        update_playhead: function(percent_played) {
-          this.settings.update_playhead.apply(this, [percent_played]);
-        }
-      })
-
+      // Overwrite audio instance methods by hand
+      audio_instance['load_progress'] = function(loaded_percent, duration) {
+        audio_instance.loaded_percent = loaded_percent;
+        audio_instance.duration = duration;
+        audio_instance.settings.load_started.apply(audio_instance);
+        audio_instance.settings.load_progress.apply(audio_instance, [audio_instance.loaded_percent]);
+      }
+      audio_instance['skip_to'] = function(percent) {
+        if (percent > audio_instance.loaded_percent) return;
+        audio_instance.element.skip_to(percent);
+      }
+      audio_instance['update_playhead'] = function(percent_played) {
+        audio_instance.settings.update_playhead.apply(audio_instance, [percent_played]);
+      }
+      audio_instance['play'] = function() {
+        audio_instance.playing = true;
+        // IE doesn't allow use of the 'play' method
+        // See: http://dev.nuclearrooster.com/2008/07/27/externalinterfaceaddcallback-can-cause-ie-js-errors-with-certain-keyworkds/
+        audio_instance.element.pplay();
+        audio_instance.settings.play.apply(audio_instance);
+      }
+      audio_instance['pause'] = function() {
+        audio_instance.playing = false;
+        // Use 'ppause' to match 'pplay', even though it isn't required
+        audio_instance.element.ppause();
+        audio_instance.settings.pause.apply(audio_instance);
+      }
+      audio_instance['load_started'] = function() {
+        // Load specified mp3 into our swf
+        audio_instance.element.loader(audio_instance.mp3);
+        // Autoplay if necessary
+        if (audio_instance.settings.autoplay) audio_instance.play.apply(audio_instance);
+        else audio_instance.pause.apply(audio_instance);
+      }
     },
 
     new_instance: function(element, options) {
-      var s = this.helpers.clone(this.settings);
+      var element = element,
+          s = this.helpers.clone(this.settings),
+          id = 'audiojs_wrapper'+this.instance_count,
+          instance_count = this.instance_count++;
+
       if (options) this.helpers.merge(s, options);
 
-      this.instance_count++;
-
-      if (s.create_player.markup) {
-        element = this.create_player(element, s.create_player);
-      } else {
-        element.parentNode.setAttribute('id', 'audiojs_'+this.instance_count);
-      }
+      if (s.create_player.markup) element = this.create_player(element, s.create_player, id);
+      else element.parentNode.setAttribute('id', id);
 
       // return new audioJS instance
       var new_audio = container[audioJS_instance].apply(element, [s]);
-      this.instances['audiojs_'+this.instance_count] = new_audio;
 
+      // If we're using flash, insert the swf & attach the required events for it
       if (s.use_flash) {
-        var id = 'audiojs_'+this.instance_count,
-            flash_source = this.flash_source.replace(/\$1/g, id);
-
-        new_audio.load_started = function() {
-          // load in correct mp3
-          this.element.load(this.mp3);
-          if (s.autoplay) new_audio.play();
-          else new_audio.pause();
-        }
-
-        // Insert swf include
-        flash_source = flash_source.replace(/\$2/g, this.settings.swf_location);
-        new_audio.wrapper.innerHTML = flash_source + new_audio.wrapper.innerHTML;
+        var id = 'audiojs'+this.instance_count,
+            flash_source = this.flash_source.replace(/\$1/g, id).replace(/\$2/g, this.settings.swf_location);
+        // This crazy insertion method helps gets around some IE bugs with innerHTML
+        var html = new_audio.wrapper.innerHTML,
+            div = document.createElement('div');
+            div.innerHTML = flash_source + html;
+        new_audio.wrapper.innerHTML = div.innerHTML;
         new_audio.element = this.helpers.get_swf(id);
 
-        // attach flash-specfic events
         this.attach_flash_events(new_audio.wrapper, new_audio);
         this.attach_events(new_audio.wrapper, new_audio);
-
       } else {
-
         this.attach_events(new_audio.wrapper, new_audio);
-
         if (s.autoplay) new_audio.play();
         else new_audio.pause();
       }
 
+      this.instances[id] = new_audio;
       return new_audio;
     }
-
   }
 
 })('audioJS', 'audioJS_instance', this);

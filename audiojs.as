@@ -39,14 +39,13 @@ public class audiojs extends Sprite {
 
     this.player_instance = root.loaderInfo.parameters.player_instance+'.';
 
-    ExternalInterface.addCallback('load', load);
+    ExternalInterface.addCallback('loader', load);
     ExternalInterface.addCallback('play_pause', play_pause);
-    ExternalInterface.addCallback('play', play);
-    ExternalInterface.addCallback('pause', pause);
+    ExternalInterface.addCallback('pplay', play);
+    ExternalInterface.addCallback('ppause', pause);
     ExternalInterface.addCallback('skip_to', skip_to);
 
-    var load_callback:String = root.loaderInfo.parameters.load_callback;
-    ExternalInterface.call(this.player_instance+load_callback);
+    ExternalInterface.call(this.player_instance+'load_started');
   }
 
   private function update_playhead(e:TimerEvent = null):void {
