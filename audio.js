@@ -1,28 +1,22 @@
 /*
 
-
   TODO:
-  - MP3s are requested multiple times?
-  - Flash integration cleanup
+  - IE
+    - document.ready fails on error
+    - IE6 styling issues
+  - iPad/iPhone
+  - Play/pause images
   - Use javacript-generated css alongside global css
   - Handle jquery elements passed in
+  - MP3s are requested multiple times?
 
 */
 
-
-// cross-browser dom-ready method
-
 (function(audioJS, audioJS_instance, container) {
 
-  /*
-
-    The window.audioJS_instance psuedo class
-
-  */
-
-  // Use Dustin Diaz's getElementsByClassName method
+  // A modified version of Dustin Diaz's getElementsByClassName implementation
+  // This version cleans up a bit and falls back to the native method if available
   var get_by_class = function(searchClass, node, tag) {
-
     var matches = [],
         node = node || document,
         tag = tag || '*',
@@ -39,15 +33,13 @@
         }
       }
     }
-
     return matches.length > 1 ? matches : matches[0];
   }
 
-
+  // The audioJS 'class'
+  // We create one of these per audio tag and then push them into audioJS.instances
   container[audioJS_instance] = function(settings) {
-
     var source = this.getElementsByTagName('source')[0];
-
     return {
       element: this,
       wrapper: this.parentNode,
@@ -63,77 +55,58 @@
         var percent_played = this.element.currentTime / this.duration;
         this.settings.update_playhead.apply(this, [percent_played]);
       },
-
       skip_to: function(percent) {
         if (percent > this.loaded_percent) return;
-
         this.element.currentTime = this.duration * percent;
         this.update_playhead();
       },
-
       load: function(mp3) {
         this.source.setAttribute('src', mp3);
         this.mp3 = mp3;
       },
-
       load_error: function() {
         this.settings.load_error.apply(this);
       },
-
       load_started: function() {
         this.duration = this.element.duration;
         this.update_playhead();
         this.settings.load_started.apply(this);
       },
-
       load_progress: function() {
         if (this.element.buffered != undefined && this.element.buffered.length) {
-
           if (!this.load_started_called) {
             this.load_started();
             this.load_started_called = true;
           }
-
           var duration_loaded = this.element.buffered.end(this.element.buffered.length - 1);
           this.loaded_percent = duration_loaded / this.duration;
 
           this.settings.load_progress.apply(this, [this.loaded_percent]);
         }
       },
-
       play_pause: function() {
         if (this.playing) this.pause();
         else this.play();
       },
-
       play: function() {
         this.playing = true;
         this.element.play();
         this.settings.play.apply(this);
       },
-
       pause: function() {
         this.playing = false;
         this.element.pause();
         this.settings.pause.apply(this);
       },
-
       track_ended: function(e) {
         this.settings.track_ended.apply(this);
       }
-
     }
-
   };
 
-  /*
-
-    The window.audioJS pseudo singleton
-
-  */
-
+  // The audioJS global 'singleton'
+  // This is our interface for creating new audioJS instances
   container[audioJS] = {
-
     instance_count: 0,
     instances: {},
 
@@ -148,6 +121,8 @@
       .audiojs .duration strong { font-weight: normal; }',
 
     // $1 is the name of the flash movie
+    // $2 is the path to the swf
+    // (+new Date) ensures we always get a fresh copy of the swf (for IE)
     flash_source: '\
       <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="1" height="1" name="$1"> \
         <param name="movie" value="$2?player_instance='+audioJS+'.instances[\'$1\']&load_callback=load_started"> \
@@ -177,54 +152,41 @@
         played_class: 'played'
       },
 
-      track_ended: function() {
-        console.warn('TRACK ENDED');
-      },
-
+      track_ended: function() {},
       load_error: function(e) {
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
             duration = get_by_class(player.time_class, this.wrapper),
             play_pause = get_by_class(player.play_pause_class, this.wrapper);
-
         this.wrapper.style.clear = 'both';
         duration.style.display = 'none';
         play_pause.style.display = 'none';
         scrubber.innerHTML = 'Error loading "'+this.mp3+'"';
       },
-
       load_started: function() {
         var player = this.settings.create_player,
             duration = get_by_class(player.duration_class, this.wrapper),
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
-
         duration.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       },
-
       load_progress: function(loaded_percent) {
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
             loaded = get_by_class(player.loader_class, this.wrapper);
-
         loaded.style.width = (scrubber.offsetWidth * loaded_percent) + 'px';
       },
-
       play_pause: function() {
         if (this.playing) this.settings.play();
         else this.settings.pause();
       },
-
       play: function() {
         var player = this.settings.create_player;
-
         get_by_class(player.play_class, this.wrapper).style.display = 'none';
         get_by_class(player.pause_class, this.wrapper).style.display = 'block';
       },
-
       pause: function() {
         var player = this.settings.create_player;
-
         get_by_class(player.play_class, this.wrapper).style.display = 'block';
         get_by_class(player.pause_class, this.wrapper).style.display = 'none';
       },
@@ -233,20 +195,17 @@
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
             progress = get_by_class(player.progress_class, this.wrapper);
-
         progress.style.width = (scrubber.offsetWidth * percent_played) + 'px';
 
         var played = get_by_class(player.played_class, this.wrapper),
             p = this.duration * percent_played,
             m = Math.floor(p / 60),
             s = Math.floor(p % 60);
-
         played.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       }
     },
 
     helpers: {
-
       merge: function(obj1, obj2) {
         for (attr in obj2) {
           if (obj1.hasOwnProperty(attr) || obj2.hasOwnProperty(attr)) {
@@ -254,11 +213,10 @@
           }
         }
       },
-
       clone: function(obj){
-        if(obj == null || typeof(obj) != 'object') return obj;
+        if (obj == null || typeof(obj) !== 'object') return obj;
         var temp = new obj.constructor();
-        for(var key in obj) temp[key] = arguments.callee(obj[key]);
+        for (var key in obj) temp[key] = arguments.callee(obj[key]);
         return temp;
       },
 
@@ -297,6 +255,7 @@
       },
 
       // Douglas Crockford's IE6 memory leak fix
+      // http://javascript.crockford.com/memory/leak.html
       purge: function(d) {
         var a = d.attributes, i;
         if (a) {
@@ -310,6 +269,9 @@
         }
       },
 
+      // DOMready function
+      // As seen here: http://webreflection.blogspot.com/2007/09/whats-wrong-with-new-iecontentloaded.html
+      // This needs replacing as any script errors will cause IE to go into an infite loop
       ready: (function(ie) {
         var d = document;
         return ie ? function(c){
@@ -338,17 +300,14 @@
       // return single audioJS instance
       return this.new_instance(element, options);
     },
-
     create_all: function(options) {
-      // automatically create from any audio tags on the page
+      // automatically create any audio tags on the page
       var audio_elements = document.getElementsByTagName('audio'),
           instances = []
           options = options || {};
-
       for (var i = 0, ii = audio_elements.length; i < ii; i++) {
         instances.push(this.new_instance(audio_elements[i], options));
       }
-
       return instances;
     },
 
@@ -382,33 +341,30 @@
       container[audioJS].events.add_listener(play_pause, 'click', function(e) {
         audio_instance.play_pause.apply(audio_instance);
       });
-
       container[audioJS].events.add_listener(scrubber, 'click', function(e) {
         var relative_left = e.clientX - left_pos(this);
         audio_instance.skip_to(relative_left / scrubber.offsetWidth);
       });
 
-      if(audio_instance.settings.use_flash) return;
+      // If we're using flash, then all the following events are no longer useful to us
+      if (audio_instance.settings.use_flash) return;
 
       var timer = setInterval(function() {
-        if(audio_instance.element.readyState > 0) {
+        if (audio_instance.element.readyState > 0) {
           clearInterval(timer);
           var timer2 = setInterval(function() {
             audio_instance.load_progress.apply(audio_instance);
-            if(audio_instance.loaded_percent >= 1) clearInterval(timer2);
+            if (audio_instance.loaded_percent >= 1) clearInterval(timer2);
           });
 
         }
       }, 10);
-
       container[audioJS].events.add_listener(audio_instance.element, 'timeupdate', function(e) {
         audio_instance.update_playhead.apply(audio_instance);
       });
-
       container[audioJS].events.add_listener(audio_instance.element, 'ended', function(e) {
         audio_instance.track_ended.apply(audio_instance);
       });
-
       container[audioJS].events.add_listener(audio_instance.source, 'error', function(e) {
         clearInterval(timer);
         audio_instance.settings.load_error.apply(audio_instance);
