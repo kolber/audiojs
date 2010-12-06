@@ -4,7 +4,7 @@
   - IE
     - document.ready fails on error
     - IE6 styling issues
-  - Show loader whilst waiting for mp3 response
+  - iPad doesn't start loading until play is called
   - Play/pause images
   - Use javacript-generated css alongside global css
   - camelCased method & variable names
