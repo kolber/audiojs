@@ -8,6 +8,7 @@
   - Use javacript-generated css alongside global css
   - camelCased method & variable names
   - Add a test case for a single player with a playlist
+  - Opera cached SWF bug?
   - MP3s are requested multiple times
 
 */
@@ -127,12 +128,12 @@
 
     // $1 is the name of the flash movie
     // $2 is the path to the swf
-    // (+new Date) ensures we always get a fresh copy of the swf (for IE)
+    // $3 is a cache invalidator
     flash_source: '\
       <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="$1" width="1" height="1" name="$1"> \
-        <param name="movie" value="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime='+(+new Date)+'"> \
+        <param name="movie" value="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime=$3"> \
         <param name="allowscriptaccess" value="always"> \
-        <embed name="$1" src="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime='+(+new Date)+'" width="1" height="1" allowscriptaccess="always"> \
+        <embed name="$1" src="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime=$3" width="1" height="1" allowscriptaccess="always"> \
       </object>',
 
     settings: {
@@ -490,7 +491,11 @@
       // If we're using flash, insert the swf & attach the required events for it
       if (s.use_flash) {
         var id = 'audiojs'+this.instance_count,
-            flash_source = this.flash_source.replace(/\$1/g, id).replace(/\$2/g, this.settings.swf_location);
+            flash_source = this.flash_source.replace(/\$1/g, id)
+                               .replace(/\$2/g, this.settings.swf_location)
+        // (+new Date) ensures we always get a fresh copy of the swf (for IE)
+                               .replace(/\$3/g, (+new Date + Math.random()));
+
         // This crazy insertion method helps gets around some IE bugs with innerHTML
         var html = new_audio.wrapper.innerHTML,
             div = document.createElement('div');
