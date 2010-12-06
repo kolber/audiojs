@@ -1,15 +1,17 @@
 /*
 
   TODO:
-  - IE
-    - document.ready fails on error
-    - IE6 styling issues
   - Play/pause images
   - Use javacript-generated css alongside global css
   - camelCased method & variable names
+
   - Add a test case for a single player with a playlist
   - Opera cached SWF bug?
   - MP3s are requested multiple times
+
+  - IE
+    - document.ready fails on error
+    - IE6 styling issues
 
 */
 
