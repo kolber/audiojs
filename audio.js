@@ -4,7 +4,6 @@
   - IE
     - document.ready fails on error
     - IE6 styling issues
-  - begin_load?
   - Play/pause images
   - Use javacript-generated css alongside global css
   - camelCased method & variable names
@@ -68,8 +67,8 @@
       load_error: function() {
         this.settings.load_error.apply(this);
       },
-      begin_load: function() {
-        this.settings.begin_load.apply(this);
+      initialised: function() {
+        this.settings.initialised.apply(this);
       },
       load_started: function() {
         this.duration = this.element.duration;
@@ -169,7 +168,7 @@
         loading.style.display = 'none';
         scrubber.innerHTML = 'Error loading "'+this.mp3+'"';
       },
-      begin_load: function() {
+      initialised: function() {
         var player = this.settings.create_player,
             loading = get_by_class(player.loading_class, this.wrapper),
             play_pause = get_by_class(player.play_pause_class, this.wrapper);
@@ -381,7 +380,7 @@
 
       container[audioJS].events.add_listener(play_pause, 'click', function(e) {
         // For ios we can start preloading the audio file now
-        if (ios && audio.element.readyState == 0) audio.begin_load.apply(audio);
+        if (ios && audio.element.readyState == 0) audio.initialised.apply(audio);
         audio.play_pause.apply(audio);
       });
 
@@ -399,7 +398,7 @@
           audio.pause.apply(audio);
           // ios never starts preloading the audio file, so we need to
           // prevent the loader displaying prematurely
-          if(!ios) audio.begin_load.apply(audio);
+          if(!ios) audio.initialised.apply(audio);
         } else if (audio.element.readyState > 1) {
           // Call pause again to handle Chrome sometimes missing readyState 0
           audio.pause.apply(audio);
@@ -474,6 +473,7 @@
       if (options) this.helpers.merge(s, options);
 
       if(element.getAttribute('autoplay') != undefined) s.autoplay = true;
+
       if (s.create_player.markup) element = this.create_player(element, s.create_player, id);
       else element.parentNode.setAttribute('id', id);
 
