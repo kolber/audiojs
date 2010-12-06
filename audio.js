@@ -143,7 +143,7 @@
       })(),
 
       create_player: {
-        markup: '<div class="play_pause"><p class="pause">PSE</p><p class="play">PLY</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div>',
+        markup: '<div class="play_pause"><p class="pause">PSE</p><p class="play">PLY</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div><div class="loading">Loading...</div>',
         play_pause_class: 'play_pause',
         play_class: 'play',
         pause_class: 'pause',
@@ -152,7 +152,8 @@
         loader_class: 'loaded',
         time_class: 'time',
         duration_class: 'duration',
-        played_class: 'played'
+        played_class: 'played',
+        loading_class: 'loading'
       },
 
       track_ended: function() {},
@@ -160,17 +161,23 @@
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
             duration = get_by_class(player.time_class, this.wrapper),
-            play_pause = get_by_class(player.play_pause_class, this.wrapper);
+            play_pause = get_by_class(player.play_pause_class, this.wrapper),
+            loading = get_by_class(player.loading_class, this.wrapper);
         this.wrapper.style.clear = 'both';
         duration.style.display = 'none';
         play_pause.style.display = 'none';
+        loading.style.display = 'none';
         scrubber.innerHTML = 'Error loading "'+this.mp3+'"';
       },
       load_started: function() {
         var player = this.settings.create_player,
+            loading = get_by_class(player.loading_class, this.wrapper),
+            time = get_by_class(player.time_class, this.wrapper),
             duration = get_by_class(player.duration_class, this.wrapper),
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
+        loading.style.display = 'none';
+        time.style.display = 'block';
         duration.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       },
       load_progress: function(loaded_percent) {
