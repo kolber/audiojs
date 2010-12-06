@@ -473,6 +473,7 @@
 
       if (options) this.helpers.merge(s, options);
 
+      if(element.getAttribute('autoplay') != undefined) s.autoplay = true;
       if (s.create_player.markup) element = this.create_player(element, s.create_player, id);
       else element.parentNode.setAttribute('id', id);
 
