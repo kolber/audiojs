@@ -72,6 +72,9 @@
         this.duration = this.element.duration;
         this.update_playhead();
         this.settings.load_started.apply(this);
+
+        if (this.settings.autoplay) this.play.apply(this);
+        else this.pause.apply(this);
       },
       load_progress: function() {
         if (this.element.buffered != undefined && this.element.buffered.length) {
@@ -463,8 +466,6 @@
         this.attach_events(new_audio.wrapper, new_audio);
       } else {
         this.attach_events(new_audio.wrapper, new_audio);
-        if (s.autoplay) new_audio.play();
-        else new_audio.pause();
       }
 
       this.instances[id] = new_audio;
