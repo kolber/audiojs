@@ -4,10 +4,10 @@
   - IE
     - document.ready fails on error
     - IE6 styling issues
-  - iPad/iPhone
+  - Show loader whilst waiting for mp3 response
   - Play/pause images
   - Use javacript-generated css alongside global css
-  - Handle jquery elements passed in
+  - camelCased method & variable names
   - MP3s are requested multiple times?
 
 */
