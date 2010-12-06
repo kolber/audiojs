@@ -15,6 +15,8 @@ Javascript:
       var as = audioJS.create_all();
     });
 
+See `test1.html` & `test2.html` for more detailed use case tests.
+
 ## Compiling Flash from the command line
 
 Using the Flex SDK (which is free), flash movies can be compiled
