@@ -6,37 +6,37 @@
     <style>
       p { clear: both; }
       .audiojsZ { font-family: monospace; position: relative; }
-      .audiojsZ .play_pauseZ { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #eee; color: #999; border: 1px solid #eee; font-size: 8px; float: left; margin: 0px 0px 10px; }
-      .audiojsZ .play_pauseZ p { display: none; width: 20px; margin: 0px; font-family: sans-serif; }
-      .audiojsZ .scrubberZ { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #eee; padding-left: 5px; line-height: 20px; white-space: nowrap; }
+      .audiojsZ .play_pauseZ { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #eee; color: #999; border: 1px solid #eee; font-size: 8px; float: left; margin: 0px 0px 10px; overflow: hidden; }
+      .audiojsZ .play_pauseZ p { width: 20px; margin: 0px; font-family: sans-serif; }
+      .audiojsZ .scrubberZ { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #eee; padding-left: 5px; line-height: 20px; white-space: nowrap; overflow: hidden; }
       .audiojsZ .progressZ { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #ccc; }
       .audiojsZ .loadedZ { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #eee; }
-      .audiojsZ .timeZ { display: none; float: left; color: #999; margin: 3px 0px 0px 10px; }
+      .audiojsZ .timeZ { display: none; float: left; color: #999; padding: 3px 0px 0px 10px; }
       .audiojsZ .timeZ em { font-style: normal; color: #666; }
       .audiojsZ .timeZ strong { font-weight: normal; }
-      .audiojsZ .loadingZ { position: absolute; top: 3px; left: 8px; }
+      .audiojsZ .loadingZ { display: none; position: absolute; top: 3px; left: 8px; }
 
       .audiojs { font-family: monospace; position: relative; }
-      .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #fcc; color: #f00; border: 1px solid #fcc; font-size: 8px; float: left; margin: 0px 0px 10px; }
-      .audiojs .play_pause p { display: none; width: 20px; margin: 0px; font-family: sans-serif; }
-      .audiojs .scrubber { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #fcc; padding-left: 5px; line-height: 20px; white-space: nowrap; }
+      .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #fcc; color: #f00; border: 1px solid #fcc; font-size: 8px; float: left; margin: 0px 0px 10px; overflow: hidden; }
+      .audiojs .play_pause p { width: 20px; margin: 0px; font-family: sans-serif; }
+      .audiojs .scrubber { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #fcc; padding-left: 5px; line-height: 20px; white-space: nowrap; overflow: hidden; }
       .audiojs .progress { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #f99; }
       .audiojs .loaded { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #fcc; }
-      .audiojs .time { display: none; float: left; color: #f00; margin: 3px 0px 0px 10px; }
+      .audiojs .time { display: none; float: left; color: #f00; padding: 3px 0px 0px 10px; }
       .audiojs .time em { font-style: normal; color: #f99; }
       .audiojs .time strong { font-weight: normal; }
-      .audiojs .loading { position: absolute; top: 3px; left: 8px; }
+      .audiojs .loading { display: none; position: absolute; top: 3px; left: 8px; }
 
       .audiojs { font-family: monospace; position: relative; }
-      .audiojs .play_pauseZZ { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #ccf; color: #00f; border: 1px solid #ccf; font-size: 8px; float: left; margin: 0px 0px 10px; }
-      .audiojs .play_pauseZZ p { display: none; width: 20px; margin: 0px; font-family: sans-serif; }
-      .audiojs .scrubberZZ { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #ccf; padding-left: 5px; line-height: 20px; white-space: nowrap; }
+      .audiojs .play_pauseZZ { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #ccf; color: #00f; border: 1px solid #ccf; font-size: 8px; float: left; margin: 0px 0px 10px; overflow: hidden; }
+      .audiojs .play_pauseZZ p { width: 20px; margin: 0px; font-family: sans-serif; }
+      .audiojs .scrubberZZ { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #ccf; padding-left: 5px; line-height: 20px; white-space: nowrap; overflow: hidden; }
       .audiojs .progressZZ { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #99f; }
       .audiojs .loadedZZ { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #ccf; }
-      .audiojs .timeZZ { display: none; float: left; color: #00f; margin: 3px 0px 0px 10px; }
+      .audiojs .timeZZ { display: none; float: left; color: #00f; padding: 3px 0px 0px 10px; }
       .audiojs .timeZZ em { font-style: normal; color: #99f; }
       .audiojs .timeZZ strong { font-weight: normal; }
-      .audiojs .loadingZZ { position: absolute; top: 3px; left: 8px; }
+      .audiojs .loadingZZ { display: none; position: absolute; top: 3px; left: 8px; }
 
     </style>
     <script src="./audio.js"></script>
@@ -64,7 +64,7 @@
 
         var a3 = audioJS.create(audios[2], {
           create_player: {
-            markup: '<div class="play_pauseZZ"><p class="pauseZZ">❙ ❙</p><p class="playZZ">▶</p></div><div class="scrubberZZ"><div class="progressZZ"></div><div class="loadedZZ"></div></div><div class="timeZZ"><em class="playedZZ">00:00</em>/<strong class="durationZZ">00:00</strong></div><div class="loadingZZ">Loading...</div>',
+            markup: '<div class="play_pauseZZ"><p class="playZZ">▶</p><p class="pauseZZ">❙ ❙</p></div><div class="scrubberZZ"><div class="progressZZ"></div><div class="loadedZZ"></div></div><div class="timeZZ"><em class="playedZZ">00:00</em>/<strong class="durationZZ">00:00</strong></div><div class="loadingZZ">Loading...</div>',
             play_pause_class: 'play_pauseZZ',
             play_class: 'playZZ',
             pause_class: 'pauseZZ',
@@ -86,12 +86,12 @@
     <p>Manual player markup</p>
 
     <div class="audiojsZ">
-      <audio id="audio_tag1" preload="auto" autobuffer>
+      <audio id="audio_tag1" preload="auto">
         <source src="./juicy1.mp3">
       </audio>
       <div class="play_pauseZ">
-        <p class="pauseZ">❙ ❙</p>
         <p class="playZ">▶</p>
+        <p class="pauseZ">❙ ❙</p>
       </div>
       <div class="scrubberZ">
         <div class="progressZ"></div>
@@ -106,12 +106,12 @@
     </div>
 
     <p>Automatic player markup</p>
-    <audio id="audio_tag2" preload="auto" autobuffer>
+    <audio id="audio_tag2" preload="auto">
       <source src="./juicy2.mp3">
     </audio>
 
     <p>Manual player markup (passed)</p>
-    <audio id="audio_tag3" preload="auto" autobuffer>
+    <audio id="audio_tag3" preload="auto">
       <source src="./juicy3.mp3">
     </audio>
 

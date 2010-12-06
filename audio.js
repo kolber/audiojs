@@ -4,12 +4,12 @@
   - IE
     - document.ready fails on error
     - IE6 styling issues
-  - iPad doesn't start loading until play is called
+  - begin_load?
   - Play/pause images
   - Use javacript-generated css alongside global css
   - camelCased method & variable names
   - Add a test case for a single player with a playlist
-  - MP3s are requested multiple times?
+  - MP3s are requested multiple times
 
 */
 
@@ -68,13 +68,13 @@
       load_error: function() {
         this.settings.load_error.apply(this);
       },
+      begin_load: function() {
+        this.settings.begin_load.apply(this);
+      },
       load_started: function() {
         this.duration = this.element.duration;
         this.update_playhead();
         this.settings.load_started.apply(this);
-
-        if (this.settings.autoplay) this.play.apply(this);
-        else this.pause.apply(this);
       },
       load_progress: function() {
         if (this.element.buffered != undefined && this.element.buffered.length) {
@@ -143,7 +143,7 @@
       })(),
 
       create_player: {
-        markup: '<div class="play_pause"><p class="pause">PSE</p><p class="play">PLY</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div><div class="loading">Loading...</div>',
+        markup: '<div class="play_pause"><p class="play">PLY</p><p class="pause">PSE</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div><div class="loading">Loading...</div>',
         play_pause_class: 'play_pause',
         play_class: 'play',
         pause_class: 'pause',
@@ -169,14 +169,23 @@
         loading.style.display = 'none';
         scrubber.innerHTML = 'Error loading "'+this.mp3+'"';
       },
+      begin_load: function() {
+        var player = this.settings.create_player,
+            loading = get_by_class(player.loading_class, this.wrapper),
+            play_pause = get_by_class(player.play_pause_class, this.wrapper);
+        loading.style.display = 'block';
+        play_pause.style.display = 'none';
+      },
       load_started: function() {
         var player = this.settings.create_player,
             loading = get_by_class(player.loading_class, this.wrapper),
             time = get_by_class(player.time_class, this.wrapper),
             duration = get_by_class(player.duration_class, this.wrapper),
+            play_pause = get_by_class(player.play_pause_class, this.wrapper),
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
         loading.style.display = 'none';
+        play_pause.style.display = 'block';
         time.style.display = 'block';
         duration.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       },
@@ -356,9 +365,10 @@
       return wrapper.getElementsByTagName('audio')[0];
     },
 
-    attach_events: function(wrapper, audio_instance) {
+    attach_events: function(wrapper, audio) {
       // Handle play/pause click
-      var player = audio_instance.settings.create_player,
+      var ios = (/(iPod|iPhone|iPad)/).test(navigator.userAgent),
+          player = audio.settings.create_player,
           play_pause = get_by_class(player.play_pause_class, wrapper),
           scrubber = get_by_class(player.scrubber_class, wrapper),
           left_pos = function(elem) {
@@ -370,77 +380,88 @@
           };
 
       container[audioJS].events.add_listener(play_pause, 'click', function(e) {
-        audio_instance.play_pause.apply(audio_instance);
+        // For ios we can start preloading the audio file now
+        if (ios && audio.element.readyState == 0) audio.begin_load.apply(audio);
+        audio.play_pause.apply(audio);
       });
 
       container[audioJS].events.add_listener(scrubber, 'click', function(e) {
         var relative_left = e.clientX - left_pos(this);
-        audio_instance.skip_to(relative_left / scrubber.offsetWidth);
+        audio.skip_to(relative_left / scrubber.offsetWidth);
       });
 
       // If we're using flash, then all the following events are no longer useful to us
-      if (audio_instance.settings.use_flash) return;
+      if (audio.settings.use_flash) return;
 
       var timer = setInterval(function() {
-        if (audio_instance.element.readyState == 4) {
+        if (audio.element.readyState == 0) {
+          // Start the player in its pause state
+          audio.pause.apply(audio);
+          // ios never starts preloading the audio file, so we need to
+          // prevent the loader displaying prematurely
+          if(!ios) audio.begin_load.apply(audio);
+        } else if (audio.element.readyState > 1) {
+          // Call pause again to handle Chrome sometimes missing readyState 0
+          audio.pause.apply(audio);
+          // Handle autoplay
+          if (audio.settings.autoplay) audio.play.apply(audio);
           clearInterval(timer);
+
           var timer2 = setInterval(function() {
-            audio_instance.load_progress.apply(audio_instance);
-            if (audio_instance.loaded_percent >= 1) clearInterval(timer2);
+            audio.load_progress.apply(audio);
+            if (audio.loaded_percent >= 1) clearInterval(timer2);
           });
 
         }
       }, 10);
 
-      container[audioJS].events.add_listener(audio_instance.element, 'timeupdate', function(e) {
-        audio_instance.update_playhead.apply(audio_instance);
+      container[audioJS].events.add_listener(audio.element, 'timeupdate', function(e) {
+        audio.update_playhead.apply(audio);
       });
 
-      container[audioJS].events.add_listener(audio_instance.element, 'ended', function(e) {
-        audio_instance.track_ended.apply(audio_instance);
+      container[audioJS].events.add_listener(audio.element, 'ended', function(e) {
+        audio.track_ended.apply(audio);
       });
 
-      container[audioJS].events.add_listener(audio_instance.source, 'error', function(e) {
+      container[audioJS].events.add_listener(audio.source, 'error', function(e) {
         clearInterval(timer);
-        audio_instance.settings.load_error.apply(audio_instance);
+        audio.settings.load_error.apply(audio);
       });
 
     },
 
-    attach_flash_events: function(element, audio_instance) {
+    attach_flash_events: function(element, audio) {
       // Overwrite audio instance methods by hand
-      audio_instance['load_progress'] = function(loaded_percent, duration) {
-        audio_instance.loaded_percent = loaded_percent;
-        audio_instance.duration = duration;
-        audio_instance.settings.load_started.apply(audio_instance);
-        audio_instance.settings.load_progress.apply(audio_instance, [audio_instance.loaded_percent]);
+      audio['load_progress'] = function(loaded_percent, duration) {
+        audio.loaded_percent = loaded_percent;
+        audio.duration = duration;
+        audio.settings.load_started.apply(audio);
+        audio.settings.load_progress.apply(audio, [audio.loaded_percent]);
       }
-      audio_instance['skip_to'] = function(percent) {
-        if (percent > audio_instance.loaded_percent) return;
-        audio_instance.element.skip_to(percent);
+      audio['skip_to'] = function(percent) {
+        if (percent > audio.loaded_percent) return;
+        audio.element.skip_to(percent);
       }
-      audio_instance['update_playhead'] = function(percent_played) {
-        audio_instance.settings.update_playhead.apply(audio_instance, [percent_played]);
+      audio['update_playhead'] = function(percent_played) {
+        audio.settings.update_playhead.apply(audio, [percent_played]);
       }
-      audio_instance['play'] = function() {
-        audio_instance.playing = true;
+      audio['play'] = function() {
+        audio.playing = true;
         // IE doesn't allow use of the 'play' method
         // See: http://dev.nuclearrooster.com/2008/07/27/externalinterfaceaddcallback-can-cause-ie-js-errors-with-certain-keyworkds/
-        audio_instance.element.pplay();
-        audio_instance.settings.play.apply(audio_instance);
+        audio.element.pplay();
+        audio.settings.play.apply(audio);
       }
-      audio_instance['pause'] = function() {
-        audio_instance.playing = false;
+      audio['pause'] = function() {
+        audio.playing = false;
         // Use 'ppause' to match 'pplay', even though it isn't required
-        audio_instance.element.ppause();
-        audio_instance.settings.pause.apply(audio_instance);
+        audio.element.ppause();
+        audio.settings.pause.apply(audio);
       }
-      audio_instance['load_started'] = function() {
+      audio['load_started'] = function() {
         // Load specified mp3 into our swf
-        audio_instance.element.loader(audio_instance.mp3);
-        // Autoplay if necessary
-        if (audio_instance.settings.autoplay) audio_instance.play.apply(audio_instance);
-        else audio_instance.pause.apply(audio_instance);
+        audio.settings.pause.apply(audio);
+        audio.element.loader(audio.mp3);
       }
     },
 
