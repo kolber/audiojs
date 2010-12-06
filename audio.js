@@ -308,11 +308,15 @@
     create: function(element, options) {
       var options = options || {}
       // return single audioJS instance
-      return this.new_instance(element, options);
+      if (element.length) {
+        return this.create_all(options, element);
+      } else {
+        return this.new_instance(element, options);
+      }
     },
-    create_all: function(options) {
+    create_all: function(options, elements) {
       // automatically create any audio tags on the page
-      var audio_elements = document.getElementsByTagName('audio'),
+      var audio_elements = elements || document.getElementsByTagName('audio'),
           instances = []
           options = options || {};
       for (var i = 0, ii = audio_elements.length; i < ii; i++) {
