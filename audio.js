@@ -8,6 +8,7 @@
   - Play/pause images
   - Use javacript-generated css alongside global css
   - camelCased method & variable names
+  - Add a test case for a single player with a playlist
   - MP3s are requested multiple times?
 
 */
