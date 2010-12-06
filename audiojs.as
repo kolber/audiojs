@@ -115,8 +115,6 @@ public class audiojs extends Sprite {
   }
 
   private function sound_ended(e:Event):void {
-    this.timer.stop();
-    ExternalInterface.call(this.player_instance+'update_playhead', 1);
     ExternalInterface.call(this.player_instance+'track_ended');
   }
 

@@ -103,6 +103,8 @@
       },
       track_ended: function(e) {
         this.settings.track_ended.apply(this);
+        this.skip_to.apply(this, [0]);
+        if (!this.settings.loop) this.pause.apply(this);
       }
     }
   };
@@ -135,6 +137,7 @@
 
     settings: {
       autoplay: false,
+      loop: false,
       swf_location: './audiojs.swf',
       use_flash: (function() {
         var a = document.createElement('audio');
@@ -439,6 +442,7 @@
       }
       audio['skip_to'] = function(percent) {
         if (percent > audio.loaded_percent) return;
+        audio.update_playhead.call(audio, [percent])
         audio.element.skip_to(percent);
       }
       audio['update_playhead'] = function(percent_played) {
@@ -459,8 +463,10 @@
       }
       audio['load_started'] = function() {
         // Load specified mp3 into our swf
-        audio.settings.pause.apply(audio);
         audio.element.loader(audio.mp3);
+        // Handle autoplay
+        if (audio.settings.autoplay) audio.play.apply(audio);
+        else audio.settings.pause.apply(audio);
       }
     },
 
@@ -473,6 +479,7 @@
       if (options) this.helpers.merge(s, options);
 
       if (element.getAttribute('autoplay') != undefined) s.autoplay = true;
+      if (element.getAttribute('loop') != undefined) s.loop = true;
 
       if (s.create_player.markup) element = this.create_player(element, s.create_player, id);
       else element.parentNode.setAttribute('id', id);
