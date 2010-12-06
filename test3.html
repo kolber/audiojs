@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>.</title>
+    <style>
+      p { clear: both; }
+
+      .audiojs { font-family: monospace; position: relative; }
+      .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 21px; text-align: center; background: #fcc; color: #f00; border: 1px solid #fcc; font-size: 8px; float: left; margin: 0px 0px 10px; overflow: hidden; }
+      .audiojs .play_pause p { width: 20px; margin: 0px; font-family: sans-serif; }
+      .audiojs .scrubber { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #fcc; padding-left: 5px; line-height: 20px; white-space: nowrap; overflow: hidden; }
+      .audiojs .progress { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #f99; }
+      .audiojs .loaded { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #fcc; }
+      .audiojs .time { display: none; float: left; color: #f00; padding: 3px 0px 0px 10px; }
+      .audiojs .time em { font-style: normal; color: #f99; }
+      .audiojs .time strong { font-weight: normal; }
+      .audiojs .loading { display: none; position: absolute; top: 3px; left: 8px; }
+
+    </style>
+    <script src="./audio.js"></script>
+    <script>
+      audioJS.events.ready(function() {
+        audioJS.create_all();
+      });
+    </script>
+  </head>
+  <body>
+    <h1>audioJS.create(element, settings)</h1>
+    <p>preload="metadata"</p>
+    <audio id="audio_tag1" preload="metadata">
+      <source src="./juicy1.mp3">
+    </audio>
+    <p>autoplay="autoplay"</p>
+    <audio id="audio_tag2" autoplay>
+      <source src="./juicy2.mp3">
+    </audio>
+  </body>
+</html>
