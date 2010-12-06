@@ -371,7 +371,7 @@
       if (audio_instance.settings.use_flash) return;
 
       var timer = setInterval(function() {
-        if (audio_instance.element.readyState > 0) {
+        if (audio_instance.element.readyState == 4) {
           clearInterval(timer);
           var timer2 = setInterval(function() {
             audio_instance.load_progress.apply(audio_instance);
