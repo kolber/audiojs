@@ -155,7 +155,7 @@
         loading_class: 'loading'
       },
 
-      track_ended: function() {},
+      track_ended: function(e) {},
       load_error: function(e) {
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
@@ -398,7 +398,7 @@
           audio.pause.apply(audio);
           // ios never starts preloading the audio file, so we need to
           // prevent the loader displaying prematurely
-          if(!ios) audio.initialised.apply(audio);
+          if (!ios) audio.initialised.apply(audio);
         } else if (audio.element.readyState > 1) {
           // Call pause again to handle Chrome sometimes missing readyState 0
           audio.pause.apply(audio);
@@ -472,7 +472,7 @@
 
       if (options) this.helpers.merge(s, options);
 
-      if(element.getAttribute('autoplay') != undefined) s.autoplay = true;
+      if (element.getAttribute('autoplay') != undefined) s.autoplay = true;
 
       if (s.create_player.markup) element = this.create_player(element, s.create_player, id);
       else element.parentNode.setAttribute('id', id);
