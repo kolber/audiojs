@@ -473,6 +473,22 @@
       }
     },
 
+    inject_flash: function(new_audio, id) {
+      // Build up the swf injections source by replacing the $keys
+      var flash_source = this.flash_source.replace(/\$1/g, id)
+      flash_source = flash_source.replace(/\$2/g, this.settings.swf_location)
+      // (+new Date) ensures we always get a fresh copy of the swf (for IE)
+      flash_source = flash_source.replace(/\$3/g, (+new Date + Math.random()));
+
+      // This insertion technique gets around bugs in IEs implementation of innerHTML
+      var html = new_audio.wrapper.innerHTML,
+          div = document.createElement('div');
+          div.innerHTML = flash_source + html;
+
+      new_audio.wrapper.innerHTML = div.innerHTML;
+      new_audio.element = this.helpers.get_swf(id);
+    },
+
     new_instance: function(element, options) {
       var element = element,
           s = this.helpers.clone(this.settings),
@@ -484,27 +500,17 @@
       if (element.getAttribute('autoplay') != undefined) s.autoplay = true;
       if (element.getAttribute('loop') != undefined) s.loop = true;
 
-      if (s.create_player.markup) element = this.create_player(element, s.create_player, id);
-      else element.parentNode.setAttribute('id', id);
+      // Create the player html if required
+      if (s.create_player.markup) element = this.create_player(element, s.create_player, wrapper_id);
+      else element.parentNode.setAttribute('id', wrapper_id);
 
       // return new audioJS instance
       var new_audio = container[audioJS_instance].apply(element, [s]);
 
       // If we're using flash, insert the swf & attach the required events for it
       if (s.use_flash) {
-        var id = 'audiojs'+this.instance_count,
-            flash_source = this.flash_source.replace(/\$1/g, id)
-                               .replace(/\$2/g, this.settings.swf_location)
-        // (+new Date) ensures we always get a fresh copy of the swf (for IE)
-                               .replace(/\$3/g, (+new Date + Math.random()));
-
-        // This crazy insertion method helps gets around some IE bugs with innerHTML
-        var html = new_audio.wrapper.innerHTML,
-            div = document.createElement('div');
-            div.innerHTML = flash_source + html;
-        new_audio.wrapper.innerHTML = div.innerHTML;
-        new_audio.element = this.helpers.get_swf(id);
-
+        // Insert the swf and overwrite
+        this.inject_flash(new_audio, id);
         this.attach_flash_events(new_audio.wrapper, new_audio);
         this.attach_events(new_audio.wrapper, new_audio);
       } else {
