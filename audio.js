@@ -521,15 +521,15 @@
       // Build new audioJS instance
       var new_audio = container[audioJS_instance].apply(element, [s]);
 
-      // Attach the required events to the object
-      this.attach_events(new_audio.wrapper, new_audio);
-
       // If we're using flash, insert the swf & attach the required events for it
       if (s.use_flash) {
         // Insert the swf and overwrite
         this.inject_flash(new_audio, id);
         this.attach_flash_events(new_audio.wrapper, new_audio);
       }
+
+      // Attach the required events to the object
+      this.attach_events(new_audio.wrapper, new_audio);
 
       // Store the instance globally
       this.instances[id] = new_audio;
