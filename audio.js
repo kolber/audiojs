@@ -71,8 +71,8 @@
       load_error: function() {
         this.settings.load_error.apply(this);
       },
-      initialised: function() {
-        this.settings.initialised.apply(this);
+      init: function() {
+        this.settings.init.apply(this);
       },
       load_started: function() {
         this.duration = this.element.duration;
@@ -175,7 +175,7 @@
         loading.style.display = 'none';
         scrubber.innerHTML = 'Error loading "'+this.mp3+'"';
       },
-      initialised: function() {
+      init: function() {
         var player = this.settings.create_player,
             loading = get_by_class(player.loading_class, this.wrapper),
             play_pause = get_by_class(player.play_pause_class, this.wrapper);
@@ -396,7 +396,7 @@
 
       container[audioJS].events.add_listener(play_pause, 'click', function(e) {
         // For ios we can start preloading the audio file now
-        if (ios && audio.element.readyState == 0) audio.initialised.apply(audio);
+        if (ios && audio.element.readyState == 0) audio.init.apply(audio);
         audio.play_pause.apply(audio);
       });
 
@@ -414,7 +414,7 @@
           audio.pause.apply(audio);
           // ios never starts preloading the audio file, so we need to
           // prevent the loader displaying prematurely
-          if (!ios) audio.initialised.apply(audio);
+          if (!ios) audio.init.apply(audio);
         } else if (audio.element.readyState > 1) {
           // Call pause again to handle Chrome sometimes missing readyState 0
           audio.pause.apply(audio);
