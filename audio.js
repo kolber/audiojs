@@ -1,8 +1,6 @@
-// A cross-browser javascript shim for enabling html5 audio 
+// A cross-browser javascript shim for html5 audio
 
-//  To do:
-//
-//  - Handle audio->src as well as audio[source]->src
+//  To do:  
 //  - Use javacript-generated css alongside global css
 //  - camelCased method & variable names
 //  - Add a test case for a single player with a playlist
@@ -448,14 +446,18 @@
   // ## The audioJS class
   // We create one of these per audio tag and then push them into `audioJS['instances']`.
   container[audioJS_instance] = function(settings) {
-    var source = this.getElementsByTagName('source')[0];
+    // First check the `<audio>` element directly for a src, then if one is not found, look for a `<source>` element.
+    var mp3 = (function(audio) {
+      var source = audio.getElementsByTagName('source')[0];
+      return audio.getAttribute('src') || (source ? source.getAttribute('src') : null);
+    })(this);
     // Each audio instance returns an object which contains an API back into the `<audio>` element.
     return {
       // Storage properties:
       element: this,
       wrapper: this.parentNode,
-      source: source,
-      mp3: source ? source.getAttribute('src') : null,
+      source: this.getElementsByTagName('source')[0] || this,
+      mp3: mp3,
       settings: settings,
       load_started_called: false,
       loaded_percent: 0,
