@@ -1,6 +1,7 @@
 /*
 
   TODO:
+  - Handle audio->src as well as audio[source]->src
   - Play/pause images
   - Use javacript-generated css alongside global css
   - camelCased method & variable names
@@ -146,7 +147,7 @@
         var a = document.createElement('audio');
         return !(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''));
       })(),
-
+      // The default markup and classes for creating the player
       create_player: {
         markup: '<div class="play_pause"><p class="play">PLY</p><p class="pause">PSE</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div><div class="loading">Loading...</div>',
         play_pause_class: 'play_pause',
@@ -160,7 +161,7 @@
         played_class: 'played',
         loading_class: 'loading'
       },
-
+      // The defaults for the user-configurable API methods
       track_ended: function(e) {},
       load_error: function(e) {
         var player = this.settings.create_player,
@@ -214,7 +215,6 @@
         get_by_class(player.play_class, this.wrapper).style.display = 'block';
         get_by_class(player.pause_class, this.wrapper).style.display = 'none';
       },
-
       update_playhead: function(percent_played) {
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
@@ -230,6 +230,8 @@
     },
 
     helpers: {
+      // Merge two objects, with obj2 overwriting obj1
+      // The merge is shallow (which is all we require here)
       merge: function(obj1, obj2) {
         for (attr in obj2) {
           if (obj1.hasOwnProperty(attr) || obj2.hasOwnProperty(attr)) {
@@ -237,12 +239,14 @@
           }
         }
       },
+      // Clone a javascript object (recursively)
       clone: function(obj){
         if (obj == null || typeof(obj) !== 'object') return obj;
         var temp = new obj.constructor();
         for (var key in obj) temp[key] = arguments.callee(obj[key]);
         return temp;
       },
+      // IE has special requirements for cloning html5 nodes
       clone_html5_node: function(audio_tag) {
         // create a html5-safe document fragment
         var fragment = document.createDocumentFragment();
@@ -255,12 +259,14 @@
         // return the audio node
         return div.firstChild;
       },
+      // The simplest method I know for accessing an swf through javascript
       get_swf: function(name) {
         var swf = document[name] || window[name];
         return swf.length > 1 ? swf[swf.length - 1] : swf;
       }
     },
-
+    // Cross-browser event-handling
+    // This isn't feature complete, but works well enough for our requirements
     events: {
       memory_leaking: false,
       listeners: [],
@@ -306,7 +312,7 @@
 
       // DOMready function
       // As seen here: http://webreflection.blogspot.com/2007/09/whats-wrong-with-new-iecontentloaded.html
-      // This needs replacing as any script errors will cause IE to go into an infite loop
+      // This needs replacing as any internal script errors will cause IE to go into an infinite loop
       ready: (function(ie) {
         var d = document;
         return ie ? function(c){
@@ -330,15 +336,18 @@
 
     },
 
+    // Create a single audio instance
     create: function(element, options) {
       var options = options || {}
-      // return single audioJS instance
+      // If an array is passed, create_all
       if (element.length) {
         return this.create_all(options, element);
       } else {
         return this.new_instance(element, options);
       }
     },
+
+    // Create a multiple audio instances
     create_all: function(options, elements) {
       // automatically create any audio tags on the page
       var audio_elements = elements || document.getElementsByTagName('audio'),
@@ -350,6 +359,7 @@
       return instances;
     },
 
+    // Inject a wrapping div and the player markup
     create_player: function(element, player, id) {
       // wrap the audio element and append the player markup to that wrapper
       var wrapper = document.createElement('div'),
@@ -395,7 +405,7 @@
         audio.skip_to(relative_left / scrubber.offsetWidth);
       });
 
-      // If we're using flash, then all the following events are no longer useful to us
+      // If we're using flash, then the following events are not required
       if (audio.settings.use_flash) return;
 
       var timer = setInterval(function() {
@@ -435,8 +445,9 @@
 
     },
 
+    // Flash requires a slightly different API to the audio object
+    // so we overwrite them to work with our SWF
     attach_flash_events: function(element, audio) {
-      // Overwrite audio instance methods by hand
       audio['load_progress'] = function(loaded_percent, duration) {
         audio.loaded_percent = loaded_percent;
         audio.duration = duration;
@@ -492,11 +503,14 @@
     new_instance: function(element, options) {
       var element = element,
           s = this.helpers.clone(this.settings),
-          id = 'audiojs_wrapper'+this.instance_count,
+          id = 'audiojs'+this.instance_count,
+          wrapper_id = 'audiojs_wrapper'+this.instance_count,
           instance_count = this.instance_count++;
 
+      // Merge the default settings with the user-defined options
       if (options) this.helpers.merge(s, options);
 
+      // Set autoplay and loop settings based of html attributes
       if (element.getAttribute('autoplay') != undefined) s.autoplay = true;
       if (element.getAttribute('loop') != undefined) s.loop = true;
 
@@ -504,7 +518,7 @@
       if (s.create_player.markup) element = this.create_player(element, s.create_player, wrapper_id);
       else element.parentNode.setAttribute('id', wrapper_id);
 
-      // return new audioJS instance
+      // Build new audioJS instance
       var new_audio = container[audioJS_instance].apply(element, [s]);
 
       // Attach the required events to the object
@@ -517,6 +531,7 @@
         this.attach_flash_events(new_audio.wrapper, new_audio);
       }
 
+      // Store the instance globally
       this.instances[id] = new_audio;
       return new_audio;
     }
