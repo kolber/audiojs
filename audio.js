@@ -51,7 +51,18 @@
       })(),
       // The default markup and classes for creating the player:
       create_player: {
-        markup: '<div class="play_pause"><p class="play">PLY</p><p class="pause">PSE</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div><div class="loading">Loading...</div>',
+        markup: '<div class="play_pause"> \
+                   <p class="play">PLY</p> \
+                   <p class="pause">PSE</p> \
+                 </div> \
+                 <div class="scrubber"> \
+                   <div class="progress"></div> \
+                   <div class="loaded"></div> \
+                 </div> \
+                 <div class="time"> \
+                   <em class="played">00:00</em>/<strong class="duration">00:00</strong> \
+                 </div> \
+                 <div class="loading">Loading...</div>',
         play_pause_class: 'play_pause',
         play_class: 'play',
         pause_class: 'pause',
