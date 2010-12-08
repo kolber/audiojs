@@ -16,20 +16,6 @@
   container[audioJS] = {
     instance_count: 0,
     instances: {},
-    // ### String storage
-    // The css required by the default player. This is is injected into a `<style>` tag dynamically.
-    default_css: '\
-      .audiojs { font-family: monospace; position: relative; } \
-      .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 20px; text-align: center; background: #eee; color: #999; border: 1px solid #eee; font-size: 8px; float: left; margin: 0px 0px 10px; overflow: hidden; } \
-      .audiojs .play_pause p { width: 20px; margin: 0px; font-family: sans-serif; } \
-      .audiojs .scrubber { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #eee; padding-left: 5px; line-height: 20px; white-space: nowrap; overflow: hidden; } \
-      .audiojs .progress { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #ccc; } \
-      .audiojs .loaded { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #eee; } \
-      .audiojs .time { display: none; float: left; color: #999; padding: 3px 0px 0px 10px; } \
-      .audiojs .time em { font-style: normal; color: #666; } \
-      .audiojs .time strong { font-weight: normal; } \
-      .audiojs .loading { display: none; position: absolute; top: 3px; left: 8px; }',
-
     // The markup for the swf. It is injected into the page if there is not support for the `<audio>` element. The `$keys` are used as a micro-templating language.  
     // `$1` The name of the flash movie  
     // `$2` The path to the swf  
@@ -77,6 +63,19 @@
         played_class: 'played',
         loading_class: 'loading'
       },
+      // ### String storage
+      // The css required by the default player. This is is dynamically injected into a `<style>` tag.
+      css: '\
+        .audiojs { font-family: monospace; position: relative; } \
+        .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 20px; text-align: center; background: #eee; color: #999; border: 1px solid #eee; font-size: 8px; float: left; margin: 0px 0px 10px; overflow: hidden; } \
+        .audiojs .play_pause p { width: 20px; margin: 0px; font-family: sans-serif; } \
+        .audiojs .scrubber { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #eee; padding-left: 5px; line-height: 20px; white-space: nowrap; overflow: hidden; } \
+        .audiojs .progress { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #ccc; } \
+        .audiojs .loaded { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #eee; } \
+        .audiojs .time { display: none; float: left; color: #999; padding: 3px 0px 0px 10px; } \
+        .audiojs .time em { font-style: normal; color: #666; } \
+        .audiojs .time strong { font-weight: normal; } \
+        .audiojs .loading { display: none; position: absolute; top: 3px; left: 8px; }',
       // The default event callbacks:
       track_ended: function(e) {},
       load_error: function(e) {
@@ -187,6 +186,9 @@
       if (element.getAttribute('loop') != undefined) s.loop = true;
       // Merge the default settings with the user-defined options.
       if (options) this.helpers.merge(s, options);
+
+      // If css has been passed in, then dynamically inject it into the `<head>`
+      if (s.css) this.helpers.inject_css(s.css);
 
       // Inject the player html if required.
       if (s.create_player.markup) element = this.create_player(element, s.create_player, wrapper_id);
@@ -575,8 +577,5 @@
     }
     return matches.length > 1 ? matches : matches[0];
   }
-  
-  // Inject the default css
-  container[audioJS].helpers.inject_css(container[audioJS].default_css);
 
 })('audioJS', 'audioJS_instance', this);
