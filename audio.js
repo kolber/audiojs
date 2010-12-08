@@ -1,9 +1,7 @@
-// A cross-browser javascript shim for enabling html5 audio 
+// A cross-browser javascript shim for html5 audio
 
-//  To do:
+//  Todo:
 //
-//  - Handle audio->src as well as audio[source]->src
-//  - Use javacript-generated css alongside global css
 //  - camelCased method & variable names
 //  - Add a test case for a single player with a playlist
 //  - Opera cached SWF bug?
@@ -18,24 +16,12 @@
   container[audioJS] = {
     instance_count: 0,
     instances: {},
-    // ### String storage
-    // The css required by the default player. This is is injected into a `<style>` tag dynamically.
-    default_css: '\
-      .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 20px; text-align: center; background: #eee; color: #666; font-size: 10px; float: left; margin: 0px 0px 10px; } \
-      .audiojs .play_pause p { display: inline; margin: 0px; font-family: sans-serif; } \
-      .audiojs .scrubber { float: left; width: 300px; height: 20px; background: #eee; position: relative; white-space: nowrap; } \
-      .audiojs .played { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #e0e0e0; } \
-      .audiojs .loaded { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #e6e6e6; } \
-      .audiojs .duration { float: left; color: #999; margin: 3px 0px 0px 10px; } \
-      .audiojs .duration em { font-style: normal; color: #666; } \
-      .audiojs .duration strong { font-weight: normal; }',
-
     // The markup for the swf. It is injected into the page if there is not support for the `<audio>` element. The `$keys` are used as a micro-templating language.  
     // `$1` The name of the flash movie  
     // `$2` The path to the swf  
     // `$3` Cache invalidation  
     flash_source: '\
-      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="$1" width="1" height="1" name="$1"> \
+      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="$1" width="1" height="1" name="$1" style="position: absolute; left: -1px;"> \
         <param name="movie" value="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime=$3"> \
         <param name="allowscriptaccess" value="always"> \
         <embed name="$1" src="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime=$3" width="1" height="1" allowscriptaccess="always"> \
@@ -53,7 +39,19 @@
       })(),
       // The default markup and classes for creating the player:
       create_player: {
-        markup: '<div class="play_pause"><p class="play">PLY</p><p class="pause">PSE</p></div><div class="scrubber"><div class="progress"></div><div class="loaded"></div></div><div class="time"><em class="played">00:00</em>/<strong class="duration">00:00</strong></div><div class="loading">Loading...</div>',
+        markup: '\
+          <div class="play_pause"> \
+            <p class="play">PLY</p> \
+            <p class="pause">PSE</p> \
+          </div> \
+          <div class="scrubber"> \
+            <div class="progress"></div> \
+            <div class="loaded"></div> \
+          </div> \
+          <div class="time"> \
+            <em class="played">00:00</em>/<strong class="duration">00:00</strong> \
+          </div> \
+          <div class="loading">Loading...</div>',
         play_pause_class: 'play_pause',
         play_class: 'play',
         pause_class: 'pause',
@@ -65,6 +63,19 @@
         played_class: 'played',
         loading_class: 'loading'
       },
+      // ### String storage
+      // The css required by the default player. This is is dynamically injected into a `<style>` tag.
+      css: '\
+        .audiojs { font-family: monospace; position: relative; } \
+        .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 20px; text-align: center; background: #eee; color: #999; border: 1px solid #eee; font-size: 8px; float: left; margin: 0px 0px 10px; overflow: hidden; } \
+        .audiojs .play_pause p { width: 20px; margin: 0px; font-family: sans-serif; } \
+        .audiojs .scrubber { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #eee; padding-left: 5px; line-height: 20px; white-space: nowrap; overflow: hidden; } \
+        .audiojs .progress { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #ccc; } \
+        .audiojs .loaded { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #eee; } \
+        .audiojs .time { display: none; float: left; color: #999; padding: 3px 0px 0px 10px; } \
+        .audiojs .time em { font-style: normal; color: #666; } \
+        .audiojs .time strong { font-weight: normal; } \
+        .audiojs .loading { display: none; position: absolute; top: 3px; left: 8px; }',
       // The default event callbacks:
       track_ended: function(e) {},
       load_error: function(e) {
@@ -175,6 +186,9 @@
       if (element.getAttribute('loop') != undefined) s.loop = true;
       // Merge the default settings with the user-defined options.
       if (options) this.helpers.merge(s, options);
+
+      // If css has been passed in, then dynamically inject it into the `<head>`
+      if (s.css) this.helpers.inject_css(s.css);
 
       // Inject the player html if required.
       if (s.create_player.markup) element = this.create_player(element, s.create_player, wrapper_id);
@@ -358,6 +372,36 @@
         for (var key in obj) temp[key] = arguments.callee(obj[key]);
         return temp;
       },
+      // **Dynamic CSS injection**
+      // Takes a string of css, inserts it into a style element, then injects it into the very top of the `<head>`
+      inject_css: function(string) {
+        var head = document.getElementsByTagName('head')[0],
+            firstchild = head.firstChild,
+            style = document.createElement('style');
+        
+        if (!head) return;
+        // If an audiojs `<style>` tag already exists, append to it
+        var prepend = '',
+            styles = document.getElementsByTagName('style');
+
+        for (var i = 0, ii = styles.length; i < ii; i++) {
+          var title = styles[i].getAttribute('title');
+          if(/audiojs/.test(title)) {
+            style = styles[i];
+            prepend = style.innerHTML;
+          }
+          break;
+        };
+
+        style.setAttribute('type', 'text/css');
+        style.setAttribute('title', 'audiojs');
+
+        if (style.styleSheet) style.styleSheet.cssText = prepend + string;
+        else style.appendChild(document.createTextNode(prepend + string));
+        
+        if(firstchild) head.insertBefore(style, firstchild);
+        else head.appendChild(styleElement);
+      },
       // **Handle all the IE6+7 requirements for cloning `<audio>` nodes**  
       // Create a html5-safe document fragment by injecting an `<audio>` element into the document fragment.
       clone_html5_node: function(audio_tag) {
@@ -448,14 +492,18 @@
   // ## The audioJS class
   // We create one of these per audio tag and then push them into `audioJS['instances']`.
   container[audioJS_instance] = function(settings) {
-    var source = this.getElementsByTagName('source')[0];
+    // First check the `<audio>` element directly for a src, then if one is not found, look for a `<source>` element.
+    var mp3 = (function(audio) {
+      var source = audio.getElementsByTagName('source')[0];
+      return audio.getAttribute('src') || (source ? source.getAttribute('src') : null);
+    })(this);
     // Each audio instance returns an object which contains an API back into the `<audio>` element.
     return {
       // Storage properties:
       element: this,
       wrapper: this.parentNode,
-      source: source,
-      mp3: source ? source.getAttribute('src') : null,
+      source: this.getElementsByTagName('source')[0] || this,
+      mp3: mp3,
       settings: settings,
       load_started_called: false,
       loaded_percent: 0,

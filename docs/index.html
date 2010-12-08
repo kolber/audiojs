@@ -1,5 +1,4 @@
 <!DOCTYPE html>  <html> <head>   <title>audio.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> <link rel="stylesheet" media="all" href="docco-additions.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               audio.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>A cross-browser javascript shim for enabling html5 audio </p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>To do:</p>
-
 <ul>
 <li>camelCased method &amp; variable names</li>
 <li>Add a test case for a single player with a playlist</li>
@@ -42,7 +41,6 @@ It also stores all of the construction helper methods and variables.</p>        
 <span class="s1">            &lt;em class=&quot;played&quot;&gt;00:00&lt;/em&gt;/&lt;strong class=&quot;duration&quot;&gt;00:00&lt;/strong&gt; \</span>
 <span class="s1">          &lt;/div&gt; \</span>
 <span class="s1">          &lt;div class=&quot;loading&quot;&gt;Loading...&lt;/div&gt;&#39;</span><span class="p">,</span>
-
         <span class="nx">play_pause_class</span><span class="o">:</span> <span class="s1">&#39;play_pause&#39;</span><span class="p">,</span>
         <span class="nx">play_class</span><span class="o">:</span> <span class="s1">&#39;play&#39;</span><span class="p">,</span>
         <span class="nx">pause_class</span><span class="o">:</span> <span class="s1">&#39;pause&#39;</span><span class="p">,</span>
@@ -383,7 +381,6 @@ As seen here: <a href="http://webreflection.blogspot.com/2007/09/whats-wrong-wit
       <span class="nx">wrapper</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">,</span>
       <span class="nx">source</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">||</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">mp3</span><span class="o">:</span> <span class="nx">mp3</span><span class="p">,</span>
-
       <span class="nx">settings</span><span class="o">:</span> <span class="nx">settings</span><span class="p">,</span>
       <span class="nx">load_started_called</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
       <span class="nx">loaded_percent</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>

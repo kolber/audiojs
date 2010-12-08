@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Test 4 - audio.js</title>
+    <style>
+      p { clear: both; }
+    </style>
+    <script src="./audio.js"></script>
+    <script>
+      audioJS.events.ready(function() {
+        audioJS.create_all();
+      });
+    </script>
+  </head>
+  <body>
+    <h1>audioJS.create(element, settings)</h1>
+    <p>Audio without source element</p>
+    <audio id="audio_tag1" src="./juicy1.mp3" preload></audio>
+  </body>
+</html>

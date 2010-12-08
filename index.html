@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>audio.js</title>
+    <style>
+      body { width: 460px; margin: 40px auto; font-family: monospace; }
+      
+      h1 { margin: 0px; }
+      p { margin: 5px 0px 30px; }
+      a { color: #09f; }
+      
+      .audiojs audio { position: absolute; left: -1px; }
+      .audiojs { width: 460px; height: 27px; background: #404040; overflow: hidden; font-family: monospace; font-size: 12px;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #444), color-stop(0.5, #555), color-stop(0.51, #444), color-stop(1, #444));
+        background: -moz-linear-gradient(center top, #444 0%, #555 50%, #444 51%, #444 100%);
+        -webkit-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2); -moz-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2); 
+        -o-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2); box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2); }
+      .audiojs .play-pause { width: 25px; height: 25px; padding: 0px 3px; float: left; overflow: hidden; border-right: 1px solid #000; }
+      .audiojs .play-pause p { width: 25px; height: 27px; margin: 0px; cursor: pointer; }
+      .audiojs .scrubber { position: relative; float: left; width: 290px; background: #5a5a5a; height: 10px; margin: 8px; border-top: 1px solid #3f3f3f; border-left: 0px; border-bottom: 0px; overflow: hidden; }
+      .audiojs .progress { position: absolute; top: 0px; left: 0px; height: 10px; width: 0px; background: #ccc; z-index: 1; 
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ccc), color-stop(0.5, #ddd), color-stop(0.51, #ccc), color-stop(1, #ccc));
+        background: -moz-linear-gradient(center top, #ccc 0%, #ddd 50%, #ccc 51%, #ccc 100%); }
+      .audiojs .loaded { position: absolute; top: 0px; left: 0px; height: 10px; width: 0px; background: #000; 
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #222), color-stop(0.5, #333), color-stop(0.51, #222), color-stop(1, #222));
+        background: -moz-linear-gradient(center top, #222 0%, #333 50%, #222 51%, #222 100%); }
+      .audiojs .time { float: left; height: 30px; line-height: 29px; margin: 0px 0px 0px 6px; padding: 0px 0px 0px 14px; border-left: 1px solid #000; color: #ddd; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5); }
+      .audiojs .time em { padding: 0px 2px 0px 0px; color: #f9f9f9; font-style: normal; }
+      .audiojs .time strong { padding: 0px 0px 0px 2px; font-weight: normal; }
+      .audiojs .error-message { float: left; display: none; margin: 0px 10px; height: 30px; line-height: 27px; color: #fff; }
+
+      .audiojs .play { background: url('./play.gif') 50% 50% no-repeat; }
+      .audiojs .pause { background: url('./pause.gif') 50% 50% no-repeat; }
+      .audiojs .loading { background: url('./loading.gif') 50% 50% no-repeat; }
+      .audiojs .error { background: url('./error.gif') 50% 50% no-repeat; }
+      
+      .loading .time,
+      .loading .play,
+      .loading .pause,
+      .loading .error { display: none; }
+
+      .error .time,
+      .error .play,
+      .error .pause,
+      .error .scrubber,
+      .error .loading { display: none; }
+      .error .error-message { display: block; }
+
+      .track-details { clear: both; height: 25px; width: 440px; padding: 0px 10px; background: #eee; color: #222; font-family: monospace; font-size: 11px; line-height: 25px;
+        -webkit-box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.15); -moz-box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.15); }
+      .track-details:before { content: '♬ '; }
+      .track-details em { font-style: normal; color: #999; }
+    </style>
+    <script src="./jquery.js"></script>
+    <script src="./audio.js"></script>
+    <script>
+      var a = audioJS;
+      a.events.ready(function() {
+        var a1 = a.create_all({
+          css: '',
+          create_player: {
+            play_pause_class: 'play-pause',
+            scrubber_class: 'scrubber'
+          },
+          load_error: function(e) {
+            $(this.wrapper).addClass('error');
+            $('.play, .pause').hide();
+            $('.error').show();
+            $('.error-message').text('Error loading: '+this.mp3);
+          },
+          init: function() {
+            $(this.wrapper).addClass('loading');
+            $('.play, .pause').hide();
+            $('.loading').show();
+          },
+          load_started: function() {
+            var m = Math.floor(this.duration / 60),
+                s = Math.floor(this.duration % 60);
+            
+            $(this.wrapper).removeClass('loading');
+            $('.duration').html((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
+          },
+          load_progress: function(percent) {
+            var scrubber_width = $('.scrubber').width();
+            $('.loaded').width(scrubber_width * percent);
+          },
+          play: function() {
+            $('.pause').show();
+            $('.play').hide();
+          },
+          pause: function() {
+            $('.pause').hide();
+            $('.play').show();
+          },
+          update_playhead: function(percent) {
+            var scrubber_width = $('.scrubber').width();
+            $('.progress').width(scrubber_width * percent);
+
+            var p = this.duration * percent,
+                m = Math.floor(p / 60),
+                s = Math.floor(p % 60);
+            $('.played').html((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
+          }
+          
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>audio.js</h1>
+    <p><a href="http://kolber.github.com/audiojs/docs/">http://kolber.github.com/audiojs/docs/</a></p>
+
+    <div class="audiojs">
+      <audio id="audio_tag1" src="./juicy1.mp3" preload="auto"></audio>
+      
+      <div class="audiojs-player">
+        <div class="play-pause">
+          <p class="play"></p>
+          <p class="pause"></p>
+          <p class="loading"></p>
+          <p class="error"></p>
+        </div>
+        <div class="scrubber">
+          <div class="progress"></div>
+          <div class="loaded"></div>
+        </div>
+        <div class="time">
+          <em class="played">00:00</em>/<strong class="duration">00:00</strong>
+        </div>
+        <div class="error-message"></div>
+      </div>
+    </div>
+    <div class="track-details">
+      Juicy-r <em>by</em> Wait What
+    </div>
+  </body>
+</html>
