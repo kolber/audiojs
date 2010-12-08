@@ -35,7 +35,7 @@
     // `$2` The path to the swf  
     // `$3` Cache invalidation  
     flash_source: '\
-      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="$1" width="1" height="1" name="$1"> \
+      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="$1" width="1" height="1" name="$1" style="position: absolute; left: -1px;"> \
         <param name="movie" value="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime=$3"> \
         <param name="allowscriptaccess" value="always"> \
         <embed name="$1" src="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime=$3" width="1" height="1" allowscriptaccess="always"> \
