@@ -216,17 +216,19 @@
     create_player: function(element, player, id) {
       // Wrap the `<audio>` element and append the player markup to that wrapper.
       var wrapper = document.createElement('div'),
-          element = element;
+          new_element = element.cloneNode(true);
       wrapper.setAttribute('class', 'audiojs');
       wrapper.setAttribute('id', id);
+
       // Fix IE's broken implementation of innerHTML & `cloneNode` for HTML5 elements.
-      if (/MSIE/.test(navigator.userAgent)) {
+      if (new_element.outerHTML && (/<:audio/).test(new_element.outerHTML)) {
+        new_element = this.helpers.clone_html5_node(element);
         wrapper.innerHTML = player.markup;
-        wrapper.appendChild(this.helpers.clone_html5_node(element));
+        wrapper.appendChild(this.helpers.clone_html5_node(new_element));
         element.outerHTML = wrapper.outerHTML;
         wrapper = document.getElementById(id);
       } else {
-        wrapper.appendChild(element.cloneNode(true));
+        wrapper.appendChild(new_element);
         wrapper.innerHTML = wrapper.innerHTML + player.markup;
         element.parentNode.replaceChild(wrapper, element);
       }
