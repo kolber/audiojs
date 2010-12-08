@@ -1,7 +1,7 @@
 // A cross-browser javascript shim for html5 audio
 
-//  To do:  
-//  - Use javacript-generated css alongside global css
+//  Todo:
+//
 //  - camelCased method & variable names
 //  - Add a test case for a single player with a playlist
 //  - Opera cached SWF bug?
@@ -370,6 +370,22 @@
         for (var key in obj) temp[key] = arguments.callee(obj[key]);
         return temp;
       },
+      // **Dynamic CSS injection**
+      // Takes a string of css, inserts it into a style element, then injects it into the very top of the `<head>`
+      inject_css: function(string) {
+        var head = document.getElementsByTagName("head")[0],
+            firstchild = head.firstChild,
+            style = document.createElement("style");
+        
+        if(!head) return;
+        style.type = "text/css";
+
+        if (style.styleSheet) style.styleSheet.cssText = string;
+        else style.appendChild(document.createTextNode(string));
+        
+        if(firstchild) head.insertBefore(style, firstchild);
+        else head.appendChild(styleElement);
+      },
       // **Handle all the IE6+7 requirements for cloning `<audio>` nodes**  
       // Create a html5-safe document fragment by injecting an `<audio>` element into the document fragment.
       clone_html5_node: function(audio_tag) {
@@ -559,5 +575,8 @@
     }
     return matches.length > 1 ? matches : matches[0];
   }
+  
+  // Inject the default css
+  container[audioJS].helpers.inject_css(container[audioJS].default_css);
 
 })('audioJS', 'audioJS_instance', this);
