@@ -277,27 +277,8 @@
       // _If `<audio>` isn't supported, don't register the following handlers._
       if (audio.settings.use_flash) return;
 
-      // Use a timer here rather than the official `progress` event, as Chrome has issues calling `progress` when loading files already in cache.
-      var timer = setInterval(function() {
-        if (audio.element.readyState == 0) {
-          // Start the player in its pause state.
-          audio.pause.apply(audio);
-          // iOS doesn't start preloading the audio file until the user interacts manually, so this stops the loader being displayed prematurely.
-          if (!ios) audio.init.apply(audio);
-        } else if (audio.element.readyState > 1) {
-          // Call `pause()` again to handle Chrome missing `readyState` `0`.
-          audio.pause.apply(audio);
-          // If autoplay has been set, start playing the audio.
-          if (audio.settings.autoplay) audio.play.apply(audio);
-          clearInterval(timer);
-          // Once we have data, then start tracking the load progress.
-          var timer2 = setInterval(function() {
-            audio.load_progress.apply(audio);
-            if (audio.loaded_percent >= 1) clearInterval(timer2);
-          });
-
-        }
-      }, 10);
+      // Start tracking the load progress of the audio
+      container[audioJS].events.track_load_progress(audio);
 
       container[audioJS].events.add_listener(audio.element, 'timeupdate', function(e) {
         audio.update_playhead.apply(audio);
@@ -308,7 +289,8 @@
       });
 
       container[audioJS].events.add_listener(audio.source, 'error', function(e) {
-        clearInterval(timer);
+        clearInterval(audio.ready_timer);
+        clearInterval(audio.load_timer);
         audio.settings.load_error.apply(audio);
       });
 
@@ -470,6 +452,32 @@
             func.call(element, window.event);
           });
         }
+      },
+
+      track_load_progress: function(audio) {
+        var ready_timer,
+            load_timer,
+            audio = audio,
+            ios = (/(iPod|iPhone|iPad)/).test(navigator.userAgent);
+        // Use a timer here rather than the official `progress` event, as Chrome has issues calling `progress` when loading files already in cache.
+        ready_timer = setInterval(function() {
+          if (audio.element.readyState == 0) {
+            // iOS doesn't start preloading the audio file until the user interacts manually, so this stops the loader being displayed prematurely.
+            if (!ios) audio.init.apply(audio);
+          } else if (audio.element.readyState > 1) {
+            // If autoplay has been set, start playing the audio.
+            if (audio.settings.autoplay) audio.play.apply(audio);
+            clearInterval(ready_timer);
+            // Once we have data, then start tracking the load progress.
+            load_timer = setInterval(function() {
+              audio.load_progress.apply(audio);
+              if (audio.loaded_percent >= 1) clearInterval(load_timer);
+            });
+          }
+        }, 10);
+        audio.ready_timer = ready_timer;
+        audio.load_timer = load_timer;
+
       },
 
       // **Douglas Crockford's IE6 memory leak fix**  
