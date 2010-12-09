@@ -588,9 +588,9 @@
         this.settings.pause.apply(this);
       },
       track_ended: function(e) {
-        this.settings.track_ended.apply(this);
         this.skip_to.apply(this, [0]);
         if (!this.settings.loop) this.pause.apply(this);
+        this.settings.track_ended.apply(this);
       }
     }
   }
