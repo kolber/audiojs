@@ -96,7 +96,7 @@
         .playing .play, .playing .loading, .playing .error { display: none; } \
         .playing .pause { display: block; } \
         \
-        .loading .time, .loading .play, .loading .pause, .loading .error { display: none; } \
+        .loading .play, .loading .pause, .loading .error { display: none; } \
         .loading .loading { display: block; } \
         \
         .error .time, .error .play, .error .pause, .error .scrubber, .error .loading { display: none; } \
