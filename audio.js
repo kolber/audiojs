@@ -298,6 +298,12 @@
 
     // Flash requires a slightly different API to the `<audio>` element, so this method is used to overwrite the default event handlers.
     attach_flash_events: function(element, audio) {
+      audio['flash_ready'] = false;
+      audio['load'] = function(mp3) {
+        audio.mp3 = mp3;
+        // If the swf isn't ready yet, then `init()` will handle loading the mp3
+        if (audio.flash_ready) audio.element.load(mp3);
+      }
       audio['load_progress'] = function(loaded_percent, duration) {
         audio.loaded_percent = loaded_percent;
         audio.duration = duration;
@@ -309,8 +315,8 @@
         audio.update_playhead.call(audio, [percent])
         audio.element.skip_to(percent);
       }
-      audio['update_playhead'] = function(percent_played) {
-        audio.settings.update_playhead.apply(audio, [percent_played]);
+      audio['update_playhead'] = function(percent) {
+        audio.settings.update_playhead.apply(audio, [percent]);
       }
       audio['play'] = function() {
         audio.playing = true;
@@ -327,10 +333,9 @@
       }
       audio['load_started'] = function() {
         // Load the mp3 specified by the audio element into the swf.
-        audio.element.loader(audio.mp3);
-
+        audio.flash_ready = true;
+        audio.element.init(audio.mp3);
         if (audio.settings.autoplay) audio.play.apply(audio);
-        else audio.settings.pause.apply(audio);
       }
     },
 
@@ -555,8 +560,10 @@
         this.update_playhead();
       },
       load: function(mp3) {
+        this.load_started_called = false;
         this.source.setAttribute('src', mp3);
         this.mp3 = mp3;
+        container[audioJS].events.track_load_progress(this);
       },
       load_error: function() {
         this.settings.load_error.apply(this);

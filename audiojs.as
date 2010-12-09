@@ -39,7 +39,8 @@ public class audiojs extends Sprite {
 
     this.player_instance = root.loaderInfo.parameters.player_instance+'.';
 
-    ExternalInterface.addCallback('loader', load);
+    ExternalInterface.addCallback('init', init);
+    ExternalInterface.addCallback('load', load);
     ExternalInterface.addCallback('play_pause', play_pause);
     ExternalInterface.addCallback('pplay', play);
     ExternalInterface.addCallback('ppause', pause);
@@ -67,13 +68,18 @@ public class audiojs extends Sprite {
       ExternalInterface.call(this.player_instance+'load_progress', load_percent, (this.duration/1000));
     }
   }
+  
+  private function init(mp3_url:String):void {
+    this.load(mp3_url);
+  }
 
   private function load(mp3_url:String):void {
+    if(this.channel) this.channel.stop();
     this.channel = new SoundChannel();
     this.sound = new Sound(new URLRequest(mp3_url));
 
-    sound.addEventListener(IOErrorEvent.IO_ERROR, this.load_error);
-    sound.addEventListener(ProgressEvent.PROGRESS, this.load_progress);
+    this.sound.addEventListener(IOErrorEvent.IO_ERROR, this.load_error);
+    this.sound.addEventListener(ProgressEvent.PROGRESS, this.load_progress);
 
     this.timer.addEventListener(TimerEvent.TIMER, this.update_playhead);
     this.timer.start();
