@@ -78,11 +78,11 @@
         .audiojs .play { display: block; } \
         .audiojs .scrubber { position: relative; float: left; width: 280px; background: #5a5a5a; height: 14px; margin: 10px; border-top: 1px solid #3f3f3f; border-left: 0px; border-bottom: 0px; overflow: hidden; } \
         .audiojs .progress { position: absolute; top: 0px; left: 0px; height: 14px; width: 0px; background: #ccc; z-index: 1; \
-          background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ccc), color-stop(0.5, #ddd), color-stop(0.51, #ccc), color-stop(1, #ccc)); \
-          background: -moz-linear-gradient(center top, #ccc 0%, #ddd 50%, #ccc 51%, #ccc 100%); } \
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ccc), color-stop(0.5, #ddd), color-stop(0.51, #ccc), color-stop(1, #ccc)); \
+          background-image: -moz-linear-gradient(center top, #ccc 0%, #ddd 50%, #ccc 51%, #ccc 100%); } \
         .audiojs .loaded { position: absolute; top: 0px; left: 0px; height: 14px; width: 0px; background: #000; \
-          background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #222), color-stop(0.5, #333), color-stop(0.51, #222), color-stop(1, #222)); \
-          background: -moz-linear-gradient(center top, #222 0%, #333 50%, #222 51%, #222 100%); } \
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #222), color-stop(0.5, #333), color-stop(0.51, #222), color-stop(1, #222)); \
+          background-image: -moz-linear-gradient(center top, #222 0%, #333 50%, #222 51%, #222 100%); } \
         .audiojs .time { float: left; height: 36px; line-height: 36px; margin: 0px 0px 0px 6px; padding: 0px 6px 0px 12px; border-left: 1px solid #000; color: #ddd; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5); } \
         .audiojs .time em { padding: 0px 2px 0px 0px; color: #f9f9f9; font-style: normal; } \
         .audiojs .time strong { padding: 0px 0px 0px 2px; font-weight: normal; } \
@@ -96,7 +96,7 @@
         .playing .play, .playing .loading, .playing .error { display: none; } \
         .playing .pause { display: block; } \
         \
-        .loading .time, .loading .play, .loading .pause, .loading .error { display: none; } \
+        .loading .play, .loading .pause, .loading .error { display: none; } \
         .loading .loading { display: block; } \
         \
         .error .time, .error .play, .error .pause, .error .scrubber, .error .loading { display: none; } \
@@ -277,27 +277,8 @@
       // _If `<audio>` isn't supported, don't register the following handlers._
       if (audio.settings.use_flash) return;
 
-      // Use a timer here rather than the official `progress` event, as Chrome has issues calling `progress` when loading files already in cache.
-      var timer = setInterval(function() {
-        if (audio.element.readyState == 0) {
-          // Start the player in its pause state.
-          audio.pause.apply(audio);
-          // iOS doesn't start preloading the audio file until the user interacts manually, so this stops the loader being displayed prematurely.
-          if (!ios) audio.init.apply(audio);
-        } else if (audio.element.readyState > 1) {
-          // Call `pause()` again to handle Chrome missing `readyState` `0`.
-          audio.pause.apply(audio);
-          // If autoplay has been set, start playing the audio.
-          if (audio.settings.autoplay) audio.play.apply(audio);
-          clearInterval(timer);
-          // Once we have data, then start tracking the load progress.
-          var timer2 = setInterval(function() {
-            audio.load_progress.apply(audio);
-            if (audio.loaded_percent >= 1) clearInterval(timer2);
-          });
-
-        }
-      }, 10);
+      // Start tracking the load progress of the audio
+      container[audioJS].events.track_load_progress(audio);
 
       container[audioJS].events.add_listener(audio.element, 'timeupdate', function(e) {
         audio.update_playhead.apply(audio);
@@ -308,7 +289,8 @@
       });
 
       container[audioJS].events.add_listener(audio.source, 'error', function(e) {
-        clearInterval(timer);
+        clearInterval(audio.ready_timer);
+        clearInterval(audio.load_timer);
         audio.settings.load_error.apply(audio);
       });
 
@@ -316,6 +298,12 @@
 
     // Flash requires a slightly different API to the `<audio>` element, so this method is used to overwrite the default event handlers.
     attach_flash_events: function(element, audio) {
+      audio['flash_ready'] = false;
+      audio['load'] = function(mp3) {
+        audio.mp3 = mp3;
+        // If the swf isn't ready yet, then `init()` will handle loading the mp3
+        if (audio.flash_ready) audio.element.load(mp3);
+      }
       audio['load_progress'] = function(loaded_percent, duration) {
         audio.loaded_percent = loaded_percent;
         audio.duration = duration;
@@ -327,8 +315,8 @@
         audio.update_playhead.call(audio, [percent])
         audio.element.skip_to(percent);
       }
-      audio['update_playhead'] = function(percent_played) {
-        audio.settings.update_playhead.apply(audio, [percent_played]);
+      audio['update_playhead'] = function(percent) {
+        audio.settings.update_playhead.apply(audio, [percent]);
       }
       audio['play'] = function() {
         audio.playing = true;
@@ -345,10 +333,9 @@
       }
       audio['load_started'] = function() {
         // Load the mp3 specified by the audio element into the swf.
-        audio.element.loader(audio.mp3);
-
+        audio.flash_ready = true;
+        audio.element.init(audio.mp3);
         if (audio.settings.autoplay) audio.play.apply(audio);
-        else audio.settings.pause.apply(audio);
       }
     },
 
@@ -472,6 +459,32 @@
         }
       },
 
+      track_load_progress: function(audio) {
+        var ready_timer,
+            load_timer,
+            audio = audio,
+            ios = (/(iPod|iPhone|iPad)/).test(navigator.userAgent);
+        // Use a timer here rather than the official `progress` event, as Chrome has issues calling `progress` when loading files already in cache.
+        ready_timer = setInterval(function() {
+          if (audio.element.readyState == 0) {
+            // iOS doesn't start preloading the audio file until the user interacts manually, so this stops the loader being displayed prematurely.
+            if (!ios) audio.init.apply(audio);
+          } else if (audio.element.readyState > 1) {
+            // If autoplay has been set, start playing the audio.
+            if (audio.settings.autoplay) audio.play.apply(audio);
+            clearInterval(ready_timer);
+            // Once we have data, then start tracking the load progress.
+            load_timer = setInterval(function() {
+              audio.load_progress.apply(audio);
+              if (audio.loaded_percent >= 1) clearInterval(load_timer);
+            });
+          }
+        }, 10);
+        audio.ready_timer = ready_timer;
+        audio.load_timer = load_timer;
+
+      },
+
       // **Douglas Crockford's IE6 memory leak fix**  
       // <http://javascript.crockford.com/memory/leak.html>  
       // This is used to release the memory leak created by fixing `this` scoping for IE. It is called on page unload.
@@ -547,8 +560,10 @@
         this.update_playhead();
       },
       load: function(mp3) {
+        this.load_started_called = false;
         this.source.setAttribute('src', mp3);
         this.mp3 = mp3;
+        container[audioJS].events.track_load_progress(this);
       },
       load_error: function() {
         this.settings.load_error.apply(this);
@@ -588,9 +603,9 @@
         this.settings.pause.apply(this);
       },
       track_ended: function(e) {
-        this.settings.track_ended.apply(this);
         this.skip_to.apply(this, [0]);
         if (!this.settings.loop) this.pause.apply(this);
+        this.settings.track_ended.apply(this);
       }
     }
   }
