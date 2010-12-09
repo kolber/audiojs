@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>audio.js</title>
+    <style>
+      li.playing:before { content: '♬'; }
+    </style>
+    <script src="./jquery.js"></script>
+    <script src="./audio.js"></script>
+    <script>
+      $(function() { 
+        // Setup the player to autoplay the next track
+        var a = audioJS.create_all({
+          track_ended: function() {
+            var next = $('ol li.playing').next();
+            if(!next.length) next = $('ol li').first();
+            next.addClass('playing').siblings().removeClass('playing');
+            audio.load($('a', next).attr('data-src'));
+            audio.play();
+          }
+        });
+        
+        // Load in the first track
+        var audio = a[0];
+            first = $('ol a').attr('data-src');
+        $('ol li').first().addClass('playing');
+        audio.load(first);
+
+        // Load in a track on click
+        $('ol a').click(function(e) {
+          e.preventDefault();
+          $(this.parentNode).addClass('playing').siblings().removeClass('playing');
+          audio.load(this.getAttribute('data-src'));
+          audio.play();
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>audio.js</h1>
+    <audio id="audio_tag1" preload="auto"></audio>
+    <ol>
+      <li><a href="#" data-src="./notorious-xx/01 dead wrong intro [the notorious b.i.g. vs. the xx].mp3">dead wrong intro</a></li>
+      <li><a href="#" data-src="./notorious-xx/02 juicy-r [the notorious b.i.g. vs. the xx].mp3">juicy-r</a></li>
+      <li><a href="#" data-src="./notorious-xx/03 it's all about the crystalizabeths [notorious b.i.g. vs. the xx].mp3">it's all about the crystalizabeths</a></li>
+      <li><a href="#" data-src="./notorious-xx/04 islands is the limit [the notorious b.i.g. vs. the xx].mp3">islands is the limit</a></li>
+      <li><a href="#" data-src="./notorious-xx/05 one more chance for a heart to skip a beat [the notorious b.i.g. vs. the xx].mp3">one more chance for a heart to skip a beat</a></li>
+      <li><a href="#" data-src="./notorious-xx/06 suicidal fantasy [the notorious b.i.g. vs. the xx].mp3">suicidal fantasy</a></li>
+      <li><a href="#" data-src="./notorious-xx/07 everyday shelter [the notorious b.i.g. vs. the xx].mp3">everyday shelter</a></li>
+    </ol>
+  </body>
+</html>
