@@ -53,8 +53,6 @@
           </div> \
           <div class="error-message"></div>',
         play_pause_class: 'play-pause',
-        play_class: 'play',
-        pause_class: 'pause',
         scrubber_class: 'scrubber',
         progress_class: 'progress',
         loader_class: 'loaded',
@@ -62,6 +60,7 @@
         duration_class: 'duration',
         played_class: 'played',
         error_message_class: 'error-message',
+        playing_class: 'playing',
         loading_class: 'loading',
         error_class: 'error'
       },
@@ -75,7 +74,8 @@
           -webkit-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); -moz-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); \
           -o-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); } \
         .audiojs .play-pause { width: 25px; height: 40px; padding: 4px 6px; margin: 0px; float: left; overflow: hidden; border-right: 1px solid #000; } \
-        .audiojs .play-pause p { width: 25px; height: 40px; margin: 0px; cursor: pointer; } \
+        .audiojs p { display: none; width: 25px; height: 40px; margin: 0px; cursor: pointer; } \
+        .audiojs .play { display: block; } \
         .audiojs .scrubber { position: relative; float: left; width: 280px; background: #5a5a5a; height: 14px; margin: 10px; border-top: 1px solid #3f3f3f; border-left: 0px; border-bottom: 0px; overflow: hidden; } \
         .audiojs .progress { position: absolute; top: 0px; left: 0px; height: 14px; width: 0px; background: #ccc; z-index: 1; \
           background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ccc), color-stop(0.5, #ddd), color-stop(0.51, #ccc), color-stop(1, #ccc)); \
@@ -93,60 +93,43 @@
         .audiojs .error { background: url("$1") -2px -61px no-repeat; } \
         .audiojs .pause { background: url("$1") -2px -91px no-repeat; } \
         \
-        .loading .time, \
-        .loading .play, \
-        .loading .pause, \
-        .loading .error { display: none; } \
+        .playing .play, .playing .loading, .playing .error { display: none; } \
+        .playing .pause { display: block; } \
         \
-        .error .time, \
-        .error .play, \
-        .error .pause, \
-        .error .scrubber, \
-        .error .loading { display: none; } \
+        .loading .time, .loading .play, .loading .pause, .loading .error { display: none; } \
+        .loading .loading { display: block; } \
+        \
+        .error .time, .error .play, .error .pause, .error .scrubber, .error .loading { display: none; } \
+        .error .error { display: block; } \
         .error .play_pause p { cursor: auto; } \
         .error .error-message { display: block; }',
       // The default event callbacks:
       track_ended: function(e) {},
       load_error: function(e) {
         var player = this.settings.create_player,
-            play = get_by_class(player.play_class, this.wrapper),
-            pause = get_by_class(player.pause_class, this.wrapper),
-            load_class = new RegExp('\s?'+player.loading_class, 'g'),
-            error = get_by_class(player.error_class, this.wrapper),
             error_message = get_by_class(player.error_message_class, this.wrapper);
-
-        this.wrapper.className += ' '+player.error_class;
-        error.style.display = 'block';
-        play.style.display = 'none';
-        pause.style.display = 'none';
-        this.wrapper.className = this.wrapper.className.replace(load_class, '');
+        container[audioJS].helpers.remove_class(this.wrapper, player.loading_class);
+        container[audioJS].helpers.add_class(this.wrapper, player.error_class);
         error_message.innerHTML = 'Error loading: "'+this.mp3+'"';
       },
       init: function() {
-        var player = this.settings.create_player,
-            play = get_by_class(player.play_class, this.wrapper),
-            pause = get_by_class(player.pause_class, this.wrapper),
-            load_class = new RegExp('\s?'+player.loading_class, 'g');
-
-        if(!(load_class).test(this.wrapper.className)) this.wrapper.className += ' '+player.loading_class;
-        play.style.display = 'none';
-        pause.style.display = 'none';
+        var player = this.settings.create_player;
+        container[audioJS].helpers.add_class(this.wrapper, player.loading_class);
       },
       load_started: function() {
         var player = this.settings.create_player,
             duration = get_by_class(player.duration_class, this.wrapper),
-            load_class = new RegExp('\s?'+player.loading_class, 'g');
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
-
-        this.wrapper.className = this.wrapper.className.replace(load_class, '');
+        
+        container[audioJS].helpers.remove_class(this.wrapper, player.loading_class);
         duration.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       },
-      load_progress: function(loaded_percent) {
+      load_progress: function(percent) {
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
             loaded = get_by_class(player.loader_class, this.wrapper);
-        loaded.style.width = (scrubber.offsetWidth * loaded_percent) + 'px';
+        loaded.style.width = (scrubber.offsetWidth * percent) + 'px';
       },
       play_pause: function() {
         if (this.playing) this.settings.play();
@@ -154,22 +137,20 @@
       },
       play: function() {
         var player = this.settings.create_player;
-        get_by_class(player.play_class, this.wrapper).style.display = 'none';
-        get_by_class(player.pause_class, this.wrapper).style.display = 'block';
+        container[audioJS].helpers.add_class(this.wrapper, player.playing_class);
       },
       pause: function() {
         var player = this.settings.create_player;
-        get_by_class(player.play_class, this.wrapper).style.display = 'block';
-        get_by_class(player.pause_class, this.wrapper).style.display = 'none';
+        container[audioJS].helpers.remove_class(this.wrapper, player.playing_class);
       },
-      update_playhead: function(percent_played) {
+      update_playhead: function(percent) {
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
             progress = get_by_class(player.progress_class, this.wrapper);
-        progress.style.width = (scrubber.offsetWidth * percent_played) + 'px';
+        progress.style.width = (scrubber.offsetWidth * percent) + 'px';
 
         var played = get_by_class(player.played_class, this.wrapper),
-            p = this.duration * percent_played,
+            p = this.duration * percent,
             m = Math.floor(p / 60),
             s = Math.floor(p % 60);
         played.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
@@ -405,6 +386,16 @@
         var temp = new obj.constructor();
         for (var key in obj) temp[key] = arguments.callee(obj[key]);
         return temp;
+      },
+      // **Adding/removing classnames from elements**
+      add_class: function(element, class_name) {
+        var re = new RegExp('(\\s|^)'+class_name+'(\\s|$)');
+        if (re.test(element.className)) return;
+        element.className += ' ' + class_name;
+      },
+      remove_class: function(element, class_name) {
+        var re = new RegExp('(\\s|^)'+class_name+'(\\s|$)');
+        element.className = element.className.replace(re,' ');
       },
       // **Dynamic CSS injection**
       // Takes a string of css, inserts it into a style element, then injects it into the very top of the `<head>`
