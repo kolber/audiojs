@@ -3,10 +3,7 @@
 //  Todo:
 //
 //  - camelCased method & variable names
-//  - Add a test case for a single player with a playlist
 //  - Opera cached SWF bug?
-//  - MP3s are requested multiple times
-//  - document.ready fails on error
 
 (function(audioJS, audioJS_instance, container) {
 
@@ -32,6 +29,7 @@
     settings: {
       autoplay: false,
       loop: false,
+      image_location: './player-graphics.gif',
       swf_location: './audiojs.swf',
       use_flash: (function() {
         var a = document.createElement('audio');
@@ -40,9 +38,11 @@
       // The default markup and classes for creating the player:
       create_player: {
         markup: '\
-          <div class="play_pause"> \
-            <p class="play">PLY</p> \
-            <p class="pause">PSE</p> \
+          <div class="play-pause"> \
+            <p class="play"></p> \
+            <p class="pause"></p> \
+            <p class="loading"></p> \
+            <p class="error"></p> \
           </div> \
           <div class="scrubber"> \
             <div class="progress"></div> \
@@ -51,70 +51,85 @@
           <div class="time"> \
             <em class="played">00:00</em>/<strong class="duration">00:00</strong> \
           </div> \
-          <div class="loading">Loading...</div>',
-        play_pause_class: 'play_pause',
-        play_class: 'play',
-        pause_class: 'pause',
+          <div class="error-message"></div>',
+        play_pause_class: 'play-pause',
         scrubber_class: 'scrubber',
         progress_class: 'progress',
         loader_class: 'loaded',
         time_class: 'time',
         duration_class: 'duration',
         played_class: 'played',
-        loading_class: 'loading'
+        error_message_class: 'error-message',
+        playing_class: 'playing',
+        loading_class: 'loading',
+        error_class: 'error'
       },
       // ### String storage
       // The css required by the default player. This is is dynamically injected into a `<style>` tag.
       css: '\
-        .audiojs { font-family: monospace; position: relative; } \
-        .audiojs .play_pause { clear: both; cursor: pointer; -webkit-text-selection: none; height: 20px; line-height: 20px; text-align: center; background: #eee; color: #999; border: 1px solid #eee; font-size: 8px; float: left; margin: 0px 0px 10px; overflow: hidden; } \
-        .audiojs .play_pause p { width: 20px; margin: 0px; font-family: sans-serif; } \
-        .audiojs .scrubber { float: left; width: 300px; height: 20px; position: relative; left: 1px; border: 1px solid #eee; padding-left: 5px; line-height: 20px; white-space: nowrap; overflow: hidden; } \
-        .audiojs .progress { z-index: 1; position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #ccc; } \
-        .audiojs .loaded { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 0px; background: #eee; } \
-        .audiojs .time { display: none; float: left; color: #999; padding: 3px 0px 0px 10px; } \
-        .audiojs .time em { font-style: normal; color: #666; } \
-        .audiojs .time strong { font-weight: normal; } \
-        .audiojs .loading { display: none; position: absolute; top: 3px; left: 8px; }',
+        .audiojs audio { position: absolute; left: -1px; } \
+        .audiojs { width: 460px; height: 36px; background: #404040; overflow: hidden; font-family: monospace; font-size: 12px; \
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #444), color-stop(0.5, #555), color-stop(0.51, #444), color-stop(1, #444)); \
+          background-image: -moz-linear-gradient(center top, #444 0%, #555 50%, #444 51%, #444 100%); \
+          -webkit-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); -moz-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); \
+          -o-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); } \
+        .audiojs .play-pause { width: 25px; height: 40px; padding: 4px 6px; margin: 0px; float: left; overflow: hidden; border-right: 1px solid #000; } \
+        .audiojs p { display: none; width: 25px; height: 40px; margin: 0px; cursor: pointer; } \
+        .audiojs .play { display: block; } \
+        .audiojs .scrubber { position: relative; float: left; width: 280px; background: #5a5a5a; height: 14px; margin: 10px; border-top: 1px solid #3f3f3f; border-left: 0px; border-bottom: 0px; overflow: hidden; } \
+        .audiojs .progress { position: absolute; top: 0px; left: 0px; height: 14px; width: 0px; background: #ccc; z-index: 1; \
+          background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ccc), color-stop(0.5, #ddd), color-stop(0.51, #ccc), color-stop(1, #ccc)); \
+          background: -moz-linear-gradient(center top, #ccc 0%, #ddd 50%, #ccc 51%, #ccc 100%); } \
+        .audiojs .loaded { position: absolute; top: 0px; left: 0px; height: 14px; width: 0px; background: #000; \
+          background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #222), color-stop(0.5, #333), color-stop(0.51, #222), color-stop(1, #222)); \
+          background: -moz-linear-gradient(center top, #222 0%, #333 50%, #222 51%, #222 100%); } \
+        .audiojs .time { float: left; height: 36px; line-height: 36px; margin: 0px 0px 0px 6px; padding: 0px 6px 0px 12px; border-left: 1px solid #000; color: #ddd; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5); } \
+        .audiojs .time em { padding: 0px 2px 0px 0px; color: #f9f9f9; font-style: normal; } \
+        .audiojs .time strong { padding: 0px 0px 0px 2px; font-weight: normal; } \
+        .audiojs .error-message { float: left; display: none; margin: 0px 10px; height: 36px; line-height: 36px; color: #fff; } \
+        \
+        .audiojs .play { background: url("$1") -2px -1px no-repeat; } \
+        .audiojs .loading { background: url("$1") -2px -31px no-repeat; } \
+        .audiojs .error { background: url("$1") -2px -61px no-repeat; } \
+        .audiojs .pause { background: url("$1") -2px -91px no-repeat; } \
+        \
+        .playing .play, .playing .loading, .playing .error { display: none; } \
+        .playing .pause { display: block; } \
+        \
+        .loading .time, .loading .play, .loading .pause, .loading .error { display: none; } \
+        .loading .loading { display: block; } \
+        \
+        .error .time, .error .play, .error .pause, .error .scrubber, .error .loading { display: none; } \
+        .error .error { display: block; } \
+        .error .play_pause p { cursor: auto; } \
+        .error .error-message { display: block; }',
       // The default event callbacks:
       track_ended: function(e) {},
       load_error: function(e) {
         var player = this.settings.create_player,
-            scrubber = get_by_class(player.scrubber_class, this.wrapper),
-            duration = get_by_class(player.time_class, this.wrapper),
-            play_pause = get_by_class(player.play_pause_class, this.wrapper),
-            loading = get_by_class(player.loading_class, this.wrapper);
-        this.wrapper.style.clear = 'both';
-        duration.style.display = 'none';
-        play_pause.style.display = 'none';
-        loading.style.display = 'none';
-        scrubber.innerHTML = 'Error loading "'+this.mp3+'"';
+            error_message = get_by_class(player.error_message_class, this.wrapper);
+        container[audioJS].helpers.remove_class(this.wrapper, player.loading_class);
+        container[audioJS].helpers.add_class(this.wrapper, player.error_class);
+        error_message.innerHTML = 'Error loading: "'+this.mp3+'"';
       },
       init: function() {
-        var player = this.settings.create_player,
-            loading = get_by_class(player.loading_class, this.wrapper),
-            play_pause = get_by_class(player.play_pause_class, this.wrapper);
-        loading.style.display = 'block';
-        play_pause.style.display = 'none';
+        var player = this.settings.create_player;
+        container[audioJS].helpers.add_class(this.wrapper, player.loading_class);
       },
       load_started: function() {
         var player = this.settings.create_player,
-            loading = get_by_class(player.loading_class, this.wrapper),
-            time = get_by_class(player.time_class, this.wrapper),
             duration = get_by_class(player.duration_class, this.wrapper),
-            play_pause = get_by_class(player.play_pause_class, this.wrapper),
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
-        loading.style.display = 'none';
-        play_pause.style.display = 'block';
-        time.style.display = 'block';
+        
+        container[audioJS].helpers.remove_class(this.wrapper, player.loading_class);
         duration.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       },
-      load_progress: function(loaded_percent) {
+      load_progress: function(percent) {
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
             loaded = get_by_class(player.loader_class, this.wrapper);
-        loaded.style.width = (scrubber.offsetWidth * loaded_percent) + 'px';
+        loaded.style.width = (scrubber.offsetWidth * percent) + 'px';
       },
       play_pause: function() {
         if (this.playing) this.settings.play();
@@ -122,28 +137,26 @@
       },
       play: function() {
         var player = this.settings.create_player;
-        get_by_class(player.play_class, this.wrapper).style.display = 'none';
-        get_by_class(player.pause_class, this.wrapper).style.display = 'block';
+        container[audioJS].helpers.add_class(this.wrapper, player.playing_class);
       },
       pause: function() {
         var player = this.settings.create_player;
-        get_by_class(player.play_class, this.wrapper).style.display = 'block';
-        get_by_class(player.pause_class, this.wrapper).style.display = 'none';
+        container[audioJS].helpers.remove_class(this.wrapper, player.playing_class);
       },
-      update_playhead: function(percent_played) {
+      update_playhead: function(percent) {
         var player = this.settings.create_player,
             scrubber = get_by_class(player.scrubber_class, this.wrapper),
             progress = get_by_class(player.progress_class, this.wrapper);
-        progress.style.width = (scrubber.offsetWidth * percent_played) + 'px';
+        progress.style.width = (scrubber.offsetWidth * percent) + 'px';
 
         var played = get_by_class(player.played_class, this.wrapper),
-            p = this.duration * percent_played,
+            p = this.duration * percent,
             m = Math.floor(p / 60),
             s = Math.floor(p % 60);
         played.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       }
     },
-    
+
     // ### Contructor functions
 
     // `create()`  
@@ -171,7 +184,7 @@
       }
       return instances;
     },
-    
+
     // ### Creating and returning a new instance
     // This goes through all the steps and logic forking required to build out a usable audioJS instance.
     new_instance: function(element, options) {
@@ -187,28 +200,28 @@
       // Merge the default settings with the user-defined options.
       if (options) this.helpers.merge(s, options);
 
-      // If css has been passed in, then dynamically inject it into the `<head>`
-      if (s.css) this.helpers.inject_css(s.css);
-
       // Inject the player html if required.
       if (s.create_player.markup) element = this.create_player(element, s.create_player, wrapper_id);
       else element.parentNode.setAttribute('id', wrapper_id);
 
       // Build out a new audioJS instance.
-      var new_audio = container[audioJS_instance].apply(element, [s]);
+      var audio = container[audioJS_instance].apply(element, [s]);
+
+      // If css has been passed in, then dynamically inject it into the `<head>`
+      if (s.css) this.helpers.inject_css(audio, s.css);
 
       // If `<audio>` isn't supported, insert the swf & attach the required events for it.
       if (s.use_flash) {
-        this.inject_flash(new_audio, id);
-        this.attach_flash_events(new_audio.wrapper, new_audio);
+        this.inject_flash(audio, id);
+        this.attach_flash_events(audio.wrapper, audio);
       }
 
       // Attach event callbacks to the new audioJS instance.
-      this.attach_events(new_audio.wrapper, new_audio);
+      this.attach_events(audio.wrapper, audio);
 
       // Store the newly-created audioJS instance.
-      this.instances[id] = new_audio;
-      return new_audio;
+      this.instances[id] = audio;
+      return audio;
     },
 
     // ### Helper methods for constructing a working player
@@ -248,7 +261,7 @@
             }
             return curleft;
           };
-      
+
       // If this is the first interaction with the player, iOS needs to start preloading the audio file.  
       // Otherwise, just play/pause.
       container[audioJS].events.add_listener(play_pause, 'click', function(e) {
@@ -263,7 +276,7 @@
 
       // _If `<audio>` isn't supported, don't register the following handlers._
       if (audio.settings.use_flash) return;
-      
+
       // Use a timer here rather than the official `progress` event, as Chrome has issues calling `progress` when loading files already in cache.
       var timer = setInterval(function() {
         if (audio.element.readyState == 0) {
@@ -338,24 +351,24 @@
         else audio.settings.pause.apply(audio);
       }
     },
-    
+
     // ### Injecting an swf from a string
     // Build up the swf source by replacing the `$keys` and then inject it into the page.
-    inject_flash: function(new_audio, id) {
-      var flash_source = this.flash_source.replace(/\$1/g, id)
-      flash_source = flash_source.replace(/\$2/g, this.settings.swf_location)
+    inject_flash: function(audio, id) {
+      var flash_source = this.flash_source.replace(/\$1/g, id);
+      flash_source = flash_source.replace(/\$2/g, audio.settings.swf_location);
       // `(+new Date)` ensures the swf is requested fresh each time
       flash_source = flash_source.replace(/\$3/g, (+new Date + Math.random()));
 
       // Use an `innerHTML` insertion technique that will work with IE.
-      var html = new_audio.wrapper.innerHTML,
+      var html = audio.wrapper.innerHTML,
           div = document.createElement('div');
           div.innerHTML = flash_source + html;
 
-      new_audio.wrapper.innerHTML = div.innerHTML;
-      new_audio.element = this.helpers.get_swf(id);
+      audio.wrapper.innerHTML = div.innerHTML;
+      audio.element = this.helpers.get_swf(id);
     },
-    
+
     // ## Helper functions
     helpers: {
       // **Merge two objects, with `obj2` overwriting `obj1`**  
@@ -374,13 +387,24 @@
         for (var key in obj) temp[key] = arguments.callee(obj[key]);
         return temp;
       },
+      // **Adding/removing classnames from elements**
+      add_class: function(element, class_name) {
+        var re = new RegExp('(\\s|^)'+class_name+'(\\s|$)');
+        if (re.test(element.className)) return;
+        element.className += ' ' + class_name;
+      },
+      remove_class: function(element, class_name) {
+        var re = new RegExp('(\\s|^)'+class_name+'(\\s|$)');
+        element.className = element.className.replace(re,' ');
+      },
       // **Dynamic CSS injection**
       // Takes a string of css, inserts it into a style element, then injects it into the very top of the `<head>`
-      inject_css: function(string) {
+      inject_css: function(audio, string) {
         var head = document.getElementsByTagName('head')[0],
             firstchild = head.firstChild,
-            style = document.createElement('style');
-        
+            style = document.createElement('style'),
+            css = string.replace(/\$1/g, audio.settings.image_location);
+
         if (!head) return;
         // If an audiojs `<style>` tag already exists, append to it
         var prepend = '',
@@ -398,9 +422,9 @@
         style.setAttribute('type', 'text/css');
         style.setAttribute('title', 'audiojs');
 
-        if (style.styleSheet) style.styleSheet.cssText = prepend + string;
-        else style.appendChild(document.createTextNode(prepend + string));
-        
+        if (style.styleSheet) style.styleSheet.cssText = prepend + css;
+        else style.appendChild(document.createTextNode(prepend + css));
+
         if(firstchild) head.insertBefore(style, firstchild);
         else head.appendChild(styleElement);
       },
@@ -490,7 +514,7 @@
 
     }
   }
-  
+
   // ## The audioJS class
   // We create one of these per audio tag and then push them into `audioJS['instances']`.
   container[audioJS_instance] = function(settings) {
@@ -570,7 +594,7 @@
       }
     }
   }
-  
+
   // **getElementsByClassName**  
   // Having to rely on `getElementsByTagName` is pretty inflexible, so a modified version of Dustin Diaz's `getElementsByClassName` has been included.
   // This version cleans up a bit and uses the native DOM method if it's available.
