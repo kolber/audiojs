@@ -392,7 +392,7 @@
 
         for (var i = 0, ii = styles.length; i < ii; i++) {
           var title = styles[i].getAttribute('title');
-          if(/audiojs/.test(title)) {
+          if (/audiojs/.test(title)) {
             style = styles[i];
             prepend = style.innerHTML;
           }
@@ -405,7 +405,7 @@
         if (style.styleSheet) style.styleSheet.cssText = prepend + css;
         else style.appendChild(document.createTextNode(prepend + css));
 
-        if(firstchild) head.insertBefore(style, firstchild);
+        if (firstchild) head.insertBefore(style, firstchild);
         else head.appendChild(styleElement);
       },
       // **Handle all the IE6+7 requirements for cloning `<audio>` nodes**  
