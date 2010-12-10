@@ -121,7 +121,6 @@
             duration = get_by_class(player.duration_class, this.wrapper),
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
-        
         container[audioJS].helpers.remove_class(this.wrapper, player.loading_class);
         duration.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       },
@@ -250,7 +249,7 @@
 
     // Attaches the callbacks from the `<audio>` object into an audioJS instance.
     attach_events: function(wrapper, audio) {
-      var ios = (/(iPod|iPhone|iPad)/).test(navigator.userAgent),
+      var ios = (/(ipod|iphone|ipad)/i).test(navigator.userAgent),
           player = audio.settings.create_player,
           play_pause = get_by_class(player.play_pause_class, wrapper),
           scrubber = get_by_class(player.scrubber_class, wrapper),
@@ -463,13 +462,14 @@
         var ready_timer,
             load_timer,
             audio = audio,
-            ios = (/(iPod|iPhone|iPad)/).test(navigator.userAgent);
+            ios = (/(ipod|iphone|ipad)/i).test(navigator.userAgent);
         // Use a timer here rather than the official `progress` event, as Chrome has issues calling `progress` when loading files already in cache.
         ready_timer = setInterval(function() {
-          if (audio.element.readyState == 0) {
+          if (audio.element.readyState > -1) {
             // iOS doesn't start preloading the audio file until the user interacts manually, so this stops the loader being displayed prematurely.
             if (!ios) audio.init.apply(audio);
-          } else if (audio.element.readyState > 1) {
+          }
+          if (audio.element.readyState > 1) {
             // If autoplay has been set, start playing the audio.
             if (audio.settings.autoplay) audio.play.apply(audio);
             clearInterval(ready_timer);
@@ -482,7 +482,6 @@
         }, 10);
         audio.ready_timer = ready_timer;
         audio.load_timer = load_timer;
-
       },
 
       // **Douglas Crockford's IE6 memory leak fix**  
@@ -572,6 +571,9 @@
         this.settings.init.apply(this);
       },
       load_started: function() {
+        // Wait until `element.duration` exists before setting up the audio player
+        if (!this.element.duration) return false;
+
         this.duration = this.element.duration;
         this.update_playhead();
         this.settings.load_started.apply(this);
@@ -579,8 +581,7 @@
       load_progress: function() {
         if (this.element.buffered != undefined && this.element.buffered.length) {
           if (!this.load_started_called) {
-            this.load_started();
-            this.load_started_called = true;
+            this.load_started_called = this.load_started();
           }
           var duration_loaded = this.element.buffered.end(this.element.buffered.length - 1);
           this.loaded_percent = duration_loaded / this.duration;
