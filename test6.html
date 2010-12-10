@@ -30,8 +30,8 @@
     <script>
       $(function() { 
         // Setup the player to autoplay the next track
-        var a = audioJS.create_all({
-          track_ended: function() {
+        var a = audiojs.createAll({
+          trackEnded: function() {
             var next = $('ol li.playing').next();
             if (!next.length) next = $('ol li').first();
             next.addClass('playing').siblings().removeClass('playing');
@@ -68,7 +68,7 @@
             prev.click();
             // spacebar
           } else if (unicode == 32) {
-            audio.play_pause();
+            audio.playPause();
           }
         })
       });

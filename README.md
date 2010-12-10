@@ -11,8 +11,8 @@ HTML:
     </audio>
 
 Javascript:
-    audioJS.events.ready(function() {
-      var as = audioJS.create_all();
+    audiojs.events.ready(function() {
+      var as = audiojs.create_all();
     });
 
 See `test1.html`, `test2.html` & `test3.html` for more detailed use case tests.

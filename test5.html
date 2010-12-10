@@ -50,15 +50,15 @@
     <script src="./jquery.js"></script>
     <script src="./audio.js"></script>
     <script>
-      var a = audioJS;
+      var a = audiojs;
       a.events.ready(function() {
-        var a1 = a.create_all({
+        var a1 = a.createAll({
           css: '',
-          create_player: {
-            play_pause_class: 'play-pause',
-            scrubber_class: 'scrubber'
+          createPlayer: {
+            playPauseClass: 'play-pause',
+            scrubberClass: 'scrubber'
           },
-          load_error: function(e) {
+          loadError: function(e) {
             $(this.wrapper).addClass('error');
             $('.play, .pause').hide();
             $('.error').show();
@@ -69,16 +69,16 @@
             $('.play, .pause').hide();
             $('.loading').show();
           },
-          load_started: function() {
+          loadStarted: function() {
             var m = Math.floor(this.duration / 60),
                 s = Math.floor(this.duration % 60);
             
             $(this.wrapper).removeClass('loading');
             $('.duration').html((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
           },
-          load_progress: function(percent) {
-            var scrubber_width = $('.scrubber').width();
-            $('.loaded').width(scrubber_width * percent);
+          loadProgress: function(percent) {
+            var scrubberWidth = $('.scrubber').width();
+            $('.loaded').width(scrubberWidth * percent);
           },
           play: function() {
             $('.pause').show();
@@ -88,9 +88,9 @@
             $('.pause').hide();
             $('.play').show();
           },
-          update_playhead: function(percent) {
-            var scrubber_width = $('.scrubber').width();
-            $('.progress').width(scrubber_width * percent);
+          updatePlayhead: function(percent) {
+            var scrubberWidth = $('.scrubber').width();
+            $('.progress').width(scrubberWidth * percent);
 
             var p = this.duration * percent,
                 m = Math.floor(p / 60),
@@ -103,7 +103,7 @@
     </script>
   </head>
   <body>
-    <h1>audioJS.create(element, settings)</h1>
+    <h1>audiojs.create(element, settings)</h1>
     <p>Custom player</p>
 
     <div class="audiojs">
