@@ -1,16 +1,10 @@
 // A cross-browser javascript shim for html5 audio
+(function(audiojs, audiojs_instance, container) {
 
-//  Todo:
-//
-//  - camelCased method & variable names
-//  - Opera cached SWF bug?
-
-(function(audioJS, audioJS_instance, container) {
-
-  // ##The audioJS interface
-  // This is the global object which provides an interface for creating new `audioJS` instances.
+  // ##The audiojs interface
+  // This is the global object which provides an interface for creating new `audiojs` instances.
   // It also stores all of the construction helper methods and variables.
-  container[audioJS] = {
+  container[audiojs] = {
     instance_count: 0,
     instances: {},
     // The markup for the swf. It is injected into the page if there is not support for the `<audio>` element. The `$keys` are used as a micro-templating language.  
@@ -19,9 +13,9 @@
     // `$3` Cache invalidation  
     flash_source: '\
       <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="$1" width="1" height="1" name="$1" style="position: absolute; left: -1px;"> \
-        <param name="movie" value="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime=$3"> \
+        <param name="movie" value="$2?player_instance='+audiojs+'.instances[\'$1\']&datetime=$3"> \
         <param name="allowscriptaccess" value="always"> \
-        <embed name="$1" src="$2?player_instance='+audioJS+'.instances[\'$1\']&datetime=$3" width="1" height="1" allowscriptaccess="always"> \
+        <embed name="$1" src="$2?player_instance='+audiojs+'.instances[\'$1\']&datetime=$3" width="1" height="1" allowscriptaccess="always"> \
       </object>',
 
     // ### The main settings object
@@ -108,20 +102,20 @@
       load_error: function(e) {
         var player = this.settings.create_player,
             error_message = get_by_class(player.error_message_class, this.wrapper);
-        container[audioJS].helpers.remove_class(this.wrapper, player.loading_class);
-        container[audioJS].helpers.add_class(this.wrapper, player.error_class);
+        container[audiojs].helpers.remove_class(this.wrapper, player.loading_class);
+        container[audiojs].helpers.add_class(this.wrapper, player.error_class);
         error_message.innerHTML = 'Error loading: "'+this.mp3+'"';
       },
       init: function() {
         var player = this.settings.create_player;
-        container[audioJS].helpers.add_class(this.wrapper, player.loading_class);
+        container[audiojs].helpers.add_class(this.wrapper, player.loading_class);
       },
       load_started: function() {
         var player = this.settings.create_player,
             duration = get_by_class(player.duration_class, this.wrapper),
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
-        container[audioJS].helpers.remove_class(this.wrapper, player.loading_class);
+        container[audiojs].helpers.remove_class(this.wrapper, player.loading_class);
         duration.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
       },
       load_progress: function(percent) {
@@ -136,11 +130,11 @@
       },
       play: function() {
         var player = this.settings.create_player;
-        container[audioJS].helpers.add_class(this.wrapper, player.playing_class);
+        container[audiojs].helpers.add_class(this.wrapper, player.playing_class);
       },
       pause: function() {
         var player = this.settings.create_player;
-        container[audioJS].helpers.remove_class(this.wrapper, player.playing_class);
+        container[audiojs].helpers.remove_class(this.wrapper, player.playing_class);
       },
       update_playhead: function(percent) {
         var player = this.settings.create_player,
@@ -159,7 +153,7 @@
     // ### Contructor functions
 
     // `create()`  
-    // Used to create a single audioJS instance.  
+    // Used to create a single audiojs instance.  
     // If an array is passed call back to `create_all()`.  
     // Otherwise, create a single instance and return it.  
     create: function(element, options) {
@@ -172,7 +166,7 @@
     },
 
     // `create_all()`  
-    // Used to create multiple audioJS instances.  
+    // Used to create multiple audiojs instances.  
     // If no array of elements is passed, then automatically find any `<audio>` tags on the page and create instances for them.
     create_all: function(options, elements) {
       var audio_elements = elements || document.getElementsByTagName('audio'),
@@ -185,7 +179,7 @@
     },
 
     // ### Creating and returning a new instance
-    // This goes through all the steps and logic forking required to build out a usable audioJS instance.
+    // This goes through all the steps and logic forking required to build out a usable audiojs instance.
     new_instance: function(element, options) {
       var element = element,
           s = this.helpers.clone(this.settings),
@@ -203,8 +197,8 @@
       if (s.create_player.markup) element = this.create_player(element, s.create_player, wrapper_id);
       else element.parentNode.setAttribute('id', wrapper_id);
 
-      // Build out a new audioJS instance.
-      var audio = container[audioJS_instance].apply(element, [s]);
+      // Build out a new audiojs instance.
+      var audio = container[audiojs_instance].apply(element, [s]);
 
       // If css has been passed in, then dynamically inject it into the `<head>`
       if (s.css) this.helpers.inject_css(audio, s.css);
@@ -215,10 +209,10 @@
         this.attach_flash_events(audio.wrapper, audio);
       }
 
-      // Attach event callbacks to the new audioJS instance.
+      // Attach event callbacks to the new audiojs instance.
       this.attach_events(audio.wrapper, audio);
 
-      // Store the newly-created audioJS instance.
+      // Store the newly-created audiojs instance.
       this.instances[id] = audio;
       return audio;
     },
@@ -247,7 +241,7 @@
       return wrapper.getElementsByTagName('audio')[0];
     },
 
-    // Attaches the callbacks from the `<audio>` object into an audioJS instance.
+    // Attaches the callbacks from the `<audio>` object into an audiojs instance.
     attach_events: function(wrapper, audio) {
       var ios = (/(ipod|iphone|ipad)/i).test(navigator.userAgent),
           player = audio.settings.create_player,
@@ -263,12 +257,12 @@
 
       // If this is the first interaction with the player, iOS needs to start preloading the audio file.  
       // Otherwise, just play/pause.
-      container[audioJS].events.add_listener(play_pause, 'click', function(e) {
+      container[audiojs].events.add_listener(play_pause, 'click', function(e) {
         if (ios && audio.element.readyState == 0) audio.init.apply(audio);
         audio.play_pause.apply(audio);
       });
 
-      container[audioJS].events.add_listener(scrubber, 'click', function(e) {
+      container[audiojs].events.add_listener(scrubber, 'click', function(e) {
         var relative_left = e.clientX - left_pos(this);
         audio.skip_to(relative_left / scrubber.offsetWidth);
       });
@@ -277,17 +271,17 @@
       if (audio.settings.use_flash) return;
 
       // Start tracking the load progress of the audio
-      container[audioJS].events.track_load_progress(audio);
+      container[audiojs].events.track_load_progress(audio);
 
-      container[audioJS].events.add_listener(audio.element, 'timeupdate', function(e) {
+      container[audiojs].events.add_listener(audio.element, 'timeupdate', function(e) {
         audio.update_playhead.apply(audio);
       });
 
-      container[audioJS].events.add_listener(audio.element, 'ended', function(e) {
+      container[audiojs].events.add_listener(audio.element, 'ended', function(e) {
         audio.track_ended.apply(audio);
       });
 
-      container[audioJS].events.add_listener(audio.source, 'error', function(e) {
+      container[audiojs].events.add_listener(audio.source, 'error', function(e) {
         clearInterval(audio.ready_timer);
         clearInterval(audio.load_timer);
         audio.settings.load_error.apply(audio);
@@ -447,7 +441,7 @@
           if (!this.memory_leaking) {
             window.attachEvent('onunload', function() {
               for (var i = 0, ii = this.listeners.length; i < ii; i++) {
-                container[audioJS].events.purge(this.listeners[i]);
+                container[audiojs].events.purge(this.listeners[i]);
               }
             });
             this.memory_leaking = true;
@@ -527,9 +521,9 @@
     }
   }
 
-  // ## The audioJS class
-  // We create one of these per audio tag and then push them into `audioJS['instances']`.
-  container[audioJS_instance] = function(settings) {
+  // ## The audiojs class
+  // We create one of these per audio tag and then push them into `audiojs['instances']`.
+  container[audiojs_instance] = function(settings) {
     // First check the `<audio>` element directly for a src, then if one is not found, look for a `<source>` element.
     var mp3 = (function(audio) {
       var source = audio.getElementsByTagName('source')[0];
@@ -562,7 +556,7 @@
         this.load_started_called = false;
         this.source.setAttribute('src', mp3);
         this.mp3 = mp3;
-        container[audioJS].events.track_load_progress(this);
+        container[audiojs].events.track_load_progress(this);
       },
       load_error: function() {
         this.settings.load_error.apply(this);
@@ -634,4 +628,4 @@
     return matches.length > 1 ? matches : matches[0];
   }
 
-})('audioJS', 'audioJS_instance', this);
+})('audiojs', 'audiojs_instance', this);

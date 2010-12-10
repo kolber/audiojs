@@ -30,7 +30,7 @@
     <script>
       $(function() { 
         // Setup the player to autoplay the next track
-        var a = audioJS.create_all({
+        var a = audiojs.create_all({
           track_ended: function() {
             var next = $('ol li.playing').next();
             if (!next.length) next = $('ol li').first();

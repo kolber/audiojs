@@ -40,10 +40,10 @@
     </style>
     <script src="./audio.js"></script>
     <script>
-      audioJS.events.ready(function() {
+      audiojs.events.ready(function() {
         var audios = document.getElementsByTagName('audio');
 
-        var a1 = audioJS.create(audios[0], {
+        var a1 = audiojs.create(audios[0], {
           css: false,
           create_player: {
             markup: false,
@@ -60,9 +60,9 @@
           }
         });
 
-        var a2 = audioJS.create(audios[1]);
+        var a2 = audiojs.create(audios[1]);
 
-        var a3 = audioJS.create(audios[2], {
+        var a3 = audiojs.create(audios[2], {
           create_player: {
             markup: '<div class="play_pauseZZ"><p class="playZZ">▶</p><p class="pauseZZ">❙ ❙</p></div><div class="scrubberZZ"><div class="progressZZ"></div><div class="loadedZZ"></div></div><div class="timeZZ"><em class="playedZZ">00:00</em>/<strong class="durationZZ">00:00</strong></div><div class="loadingZZ">Loading...</div>',
             play_pause_class: 'play_pauseZZ',
@@ -82,7 +82,7 @@
     </script>
   </head>
   <body>
-    <h1>audioJS.create(element, settings)</h1>
+    <h1>audiojs.create(element, settings)</h1>
     <p>Manual player markup</p>
 
     <div class="audiojsZ">
