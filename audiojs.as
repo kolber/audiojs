@@ -74,10 +74,13 @@ public class audiojs extends Sprite {
   }
 
   private function load(mp3_url:String):void {
-    if(this.channel) this.channel.stop();
+    if (this.channel) this.channel.stop();
+    if (this.sound) this.sound.removeEventListener(ProgressEvent.PROGRESS, this.load_progress);
+    
     this.channel = new SoundChannel();
     this.sound = new Sound(new URLRequest(mp3_url));
-
+    
+    this.pause_point = 0;
     this.sound.addEventListener(IOErrorEvent.IO_ERROR, this.load_error);
     this.sound.addEventListener(ProgressEvent.PROGRESS, this.load_progress);
 
