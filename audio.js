@@ -23,6 +23,7 @@
     settings: {
       autoplay: false,
       loop: false,
+      preload: true,
       imageLocation: './player-graphics.gif',
       swfLocation: './audiojs.swf',
       useFlash: (function() {
@@ -116,7 +117,7 @@
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
         container[audiojs].helpers.removeClass(this.wrapper, player.loadingClass);
-        duration.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
+        duration.innerHTML = ((m<10?'0':'')+m+':'+(s<10?'0':'')+s);
       },
       loadProgress: function(percent) {
         var player = this.settings.createPlayer,
@@ -146,7 +147,7 @@
             p = this.duration * percent,
             m = Math.floor(p / 60),
             s = Math.floor(p % 60);
-        played.innerHTML = ((m<10?"0":"")+m+":"+(s<10?"0":"")+s);
+        played.innerHTML = ((m<10?'0':'')+m+':'+(s<10?'0':'')+s);
       }
     },
 
@@ -190,6 +191,7 @@
       // Check for autoplay and loop attributes and write them into the settings.
       if (element.getAttribute('autoplay') != undefined) s.autoplay = true;
       if (element.getAttribute('loop') != undefined) s.loop = true;
+      if (element.getAttribute('preload') == 'none') s.preload = false;
       // Merge the default settings with the user-defined options.
       if (options) this.helpers.merge(s, options);
 
@@ -461,7 +463,7 @@
         readyTimer = setInterval(function() {
           if (audio.element.readyState > -1) {
             // iOS doesn't start preloading the audio file until the user interacts manually, so this stops the loader being displayed prematurely.
-            if (!ios) audio.init.apply(audio);
+            if (audio.settings.preload && !ios) audio.init.apply(audio);
           }
           if (audio.element.readyState > 1) {
             // If autoplay has been set, start playing the audio.
@@ -513,7 +515,7 @@
           f();
         } :
         function(c){
-          d.addEventListener("DOMContentLoaded", c, false);
+          d.addEventListener('DOMContentLoaded', c, false);
         }
       })(/*@cc_on 1@*/)
 
