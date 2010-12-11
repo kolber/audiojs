@@ -202,7 +202,7 @@
       // Build out a new audiojs instance.
       var audio = container[audiojsInstance].apply(element, [s]);
 
-      // If css has been passed in, then dynamically inject it into the `<head>`
+      // If css has been passed in, then dynamically inject it into the `<head>`.
       if (s.css) this.helpers.injectCss(audio, s.css);
 
       // If `<audio>` isn't supported, insert the swf & attach the required events for it.
@@ -272,7 +272,7 @@
       // _If `<audio>` isn't supported, don't register the following handlers._
       if (audio.settings.useFlash) return;
 
-      // Start tracking the load progress of the audio
+      // Start tracking the load progress of the audio.
       container[audiojs].events.trackLoadProgress(audio);
 
       container[audiojs].events.addListener(audio.element, 'timeupdate', function(e) {
@@ -296,7 +296,7 @@
       audio['flashReady'] = false;
       audio['load'] = function(mp3) {
         audio.mp3 = mp3;
-        // If the swf isn't ready yet, then `init()` will handle loading the mp3
+        // If the swf isn't ready yet, then `init()` will handle loading the mp3.
         if (audio.flashReady) audio.element.load(mp3);
       }
       audio['loadProgress'] = function(percent, duration) {
@@ -339,7 +339,7 @@
     injectFlash: function(audio, id) {
       var flashSource = this.flashSource.replace(/\$1/g, id);
       flashSource = flashSource.replace(/\$2/g, audio.settings.swfLocation);
-      // `(+new Date)` ensures the swf is requested fresh each time
+      // `(+new Date)` ensures the swf is requested fresh each time.
       flashSource = flashSource.replace(/\$3/g, (+new Date + Math.random()));
 
       // Use an `innerHTML` insertion technique that will work with IE.
@@ -379,8 +379,8 @@
         var re = new RegExp('(\\s|^)'+className+'(\\s|$)');
         element.className = element.className.replace(re,' ');
       },
-      // **Dynamic CSS injection**
-      // Takes a string of css, inserts it into a style element, then injects it into the very top of the `<head>`
+      // **Dynamic CSS injection**  
+      // Takes a string of css, inserts it into a style element, then injects it into the very top of the `<head>`.
       injectCss: function(audio, string) {
         var head = document.getElementsByTagName('head')[0],
             firstchild = head.firstChild,
@@ -388,7 +388,7 @@
             css = string.replace(/\$1/g, audio.settings.imageLocation);
 
         if (!head) return;
-        // If an audiojs `<style>` tag already exists, append to it
+        // If an audiojs `<style>` tag already exists, append to it.
         var prepend = '',
             styles = document.getElementsByTagName('style');
 
@@ -466,7 +466,7 @@
             if (audio.settings.preload && !ios) audio.init.apply(audio);
           }
           if (audio.element.readyState > 1) {
-            // If autoplay has been set, start playing the audio.
+            // If autoplay has been set, start playing the audio now.
             if (audio.settings.autoplay) audio.play.apply(audio);
             clearInterval(readyTimer);
             // Once we have data, then start tracking the load progress.
@@ -497,7 +497,7 @@
       },
 
       // **DOMready function**  
-      // As seen here: <http://webreflection.blogspot.com/2007/09/whats-wrong-with-new-iecontentloaded.html>  
+      // As seen here: <http://webreflection.blogspot.com/2007/09/whats-wrong-with-new-iecontentloaded.html>.
       ready: (function(ie) {
         var d = document;
         return ie ? function(c){
@@ -566,7 +566,7 @@
         this.settings.init.apply(this);
       },
       loadStarted: function() {
-        // Wait until `element.duration` exists before setting up the audio player
+        // Wait until `element.duration` exists before setting up the audio player.
         if (!this.element.duration) return false;
 
         this.duration = this.element.duration;
