@@ -188,7 +188,7 @@
           wrapperId = 'audiojs_wrapper'+this.instanceCount,
           instanceCount = this.instanceCount++;
 
-      // Check for autoplay and loop attributes and write them into the settings.
+      // Check for `autoplay`, `loop` and `preload` attributes and write them into the settings.
       if (element.getAttribute('autoplay') != undefined) s.autoplay = true;
       if (element.getAttribute('loop') != undefined) s.loop = true;
       if (element.getAttribute('preload') == 'none') s.preload = false;
@@ -244,8 +244,7 @@
 
     // Attaches useful event callbacks to an `audiojs` instance.
     attachEvents: function(wrapper, audio) {
-      var ios = (/(ipod|iphone|ipad)/i).test(navigator.userAgent),
-          player = audio.settings.createPlayer,
+      var player = audio.settings.createPlayer,
           playPause = getByClass(player.playPauseClass, wrapper),
           scrubber = getByClass(player.scrubberClass, wrapper),
           leftPos = function(elem) {
@@ -256,10 +255,7 @@
             return curleft;
           };
 
-      // If this is the first interaction with the player, iOS needs to start preloading the audio file.  
-      // Otherwise, just play/pause.
       container[audiojs].events.addListener(playPause, 'click', function(e) {
-        if (ios && audio.element.readyState == 0) audio.init.apply(audio);
         audio.playPause.apply(audio);
       });
 
@@ -271,7 +267,7 @@
       // _If flash is being used, then the following handlers don't need to be registered._
       if (audio.settings.useFlash) return;
 
-      // Start tracking the load progress of the audio.
+      // Start tracking the load progress of the track.
       container[audiojs].events.trackLoadProgress(audio);
 
       container[audiojs].events.addListener(audio.element, 'timeupdate', function(e) {
@@ -314,6 +310,12 @@
         audio.settings.updatePlayhead.apply(audio, [percent]);
       }
       audio['play'] = function() {
+        // If the audio hasn't started preloading, then start it now.  
+        // Then set `preload` to `true`, so that any tracks loaded in subsequently are loaded straight away.
+        if (!audio.settings.preload) {
+          audio.settings.preload = true;
+          audio.element.init(audio.mp3);
+        }
         audio.playing = true;
         // IE doesn't allow a method named `play()` to be exposed through `ExternalInterface`, so lets go with `pplay()`.  
         // <http://dev.nuclearrooster.com/2008/07/27/externalinterfaceaddcallback-can-cause-ie-js-errors-with-certain-keyworkds/>
@@ -328,8 +330,8 @@
       }
       audio['loadStarted'] = function() {
         // Load the mp3 specified by the audio element into the swf.
-        audio.element.init(audio.mp3);
         audio.swfReady = true;
+        if (audio.settings.preload) audio.element.init(audio.mp3);
         if (audio.settings.autoplay) audio.play.apply(audio);
       }
     },
@@ -453,6 +455,9 @@
       },
 
       trackLoadProgress: function(audio) {
+        // If `preload` has been set to `none`, then we don't want to start loading the track yet.
+        if (!audio.settings.preload) return;
+
         var readyTimer,
             loadTimer,
             audio = audio,
@@ -461,8 +466,8 @@
         // Use timers here rather than the official `progress` event, as Chrome has issues calling `progress` when loading mp3 files from cache.
         readyTimer = setInterval(function() {
           if (audio.element.readyState > -1) {
-            // iOS doesn't start preloading the audio file until the user interacts manually, so this stops the loader being displayed prematurely.
-            if (audio.settings.preload && !ios) audio.init.apply(audio);
+            // iOS doesn't start preloading the mp3 until the user interacts manually, so this stops the loader being displayed prematurely.
+            if (!ios) audio.init.apply(audio);
           }
           if (audio.element.readyState > 1) {
             if (audio.settings.autoplay) audio.play.apply(audio);
@@ -588,6 +593,16 @@
         else this.play();
       },
       play: function() {
+        var ios = (/(ipod|iphone|ipad)/i).test(navigator.userAgent);
+        // On iOS this interaction will trigger loading the mp3, so run init.
+        if (ios && this.element.readyState == 0) this.init.apply(this);
+        // If the audio hasn't started preloading, then start it now.  
+        // Then set `preload` to `true`, so that any tracks loaded in subsequently are loaded straight away.
+        if (!this.settings.preload) {
+          this.settings.preload = true;
+          this.element.setAttribute('preload', 'auto');
+          container[audiojs].events.trackLoadProgress(this);
+        }
         this.playing = true;
         this.element.play();
         this.settings.play.apply(this);
