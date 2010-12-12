@@ -25,34 +25,19 @@
       .audiojs .time strong { padding: 0px 0px 0px 2px; font-weight: normal; }
       .audiojs .error-message { float: left; display: none; margin: 0px 10px; height: 30px; line-height: 27px; color: #fff; }
 
-      .audiojs .play { background: url('./player-graphics.gif') -2px -1px no-repeat; }
-      .audiojs .loading { background: url('./player-graphics.gif') -2px -31px no-repeat; }
-      .audiojs .error { background: url('./player-graphics.gif') -2px -61px no-repeat; }
-      .audiojs .pause { background: url('./player-graphics.gif') -2px -91px no-repeat; }
-      
-      .loading .time,
-      .loading .play,
-      .loading .pause,
-      .loading .error { display: none; }
-
-      .error .time,
-      .error .play,
-      .error .pause,
-      .error .scrubber,
-      .error .loading { display: none; }
-      .error .error-message { display: block; }
-
       .track-details { clear: both; height: 25px; width: 440px; padding: 0px 10px; background: #eee; color: #222; font-family: monospace; font-size: 11px; line-height: 25px;
         -webkit-box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.15); -moz-box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.15); }
       .track-details:before { content: '♬ '; }
       .track-details em { font-style: normal; color: #999; }
     </style>
     <script src="./jquery.js"></script>
-    <script src="./audio.js"></script>
+    <script src="../js/audio.js"></script>
     <script>
       var a = audiojs;
       a.events.ready(function() {
         var a1 = a.createAll({
+          imageLocation: '../images/player-graphics.gif',
+          swfLocation: '../swf/audiojs.swf',
           css: '',
           createPlayer: {
             playPauseClass: 'play-pause',
@@ -107,7 +92,7 @@
     <p>Custom player</p>
 
     <div class="audiojs">
-      <audio src="./juicy1.mp3" preload="auto"></audio>
+      <audio src="./mp3/juicy1.mp3" preload="auto"></audio>
       
       <div class="audiojs-player">
         <div class="play-pause">

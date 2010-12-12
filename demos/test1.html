@@ -6,10 +6,13 @@
     <style>
       p { clear: both; }
     </style>
-    <script src="./audio.js"></script>
+    <script src="../js/audio.js"></script>
     <script>
       audiojs.events.ready(function() {
-        var as = audiojs.createAll();
+        var as = audiojs.createAll({
+          imageLocation: '../images/player-graphics.gif',
+          swfLocation: '../swf/audiojs.swf'
+        });
       });
     </script>
   </head>
@@ -22,12 +25,12 @@
 
     <p>Load local file</p>
     <audio preload="auto">
-      <source src="./juicy1.mp3">
+      <source src="./mp3/juicy1.mp3">
     </audio>
 
     <p>Load failure (from source)</p>
     <audio preload="auto">
-      <source src="./juicyz.mp3">
+      <source src="./mp3/juicyz.mp3">
     </audio>
   </body>
 </html>

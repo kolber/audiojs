@@ -6,20 +6,23 @@
     <style>
       p { clear: both; }
     </style>
-    <script src="./audio.js"></script>
+    <script src="../js/audio.js"></script>
     <script>
       audiojs.events.ready(function() {
-        audiojs.createAll();
+        audiojs.createAll({
+          imageLocation: '../images/player-graphics.gif',
+          swfLocation: '../swf/audiojs.swf'
+        });
       });
     </script>
   </head>
   <body>
     <h1>audiojs.create(element, settings)</h1>
     <p>preload="metadata"</p>
-    <audio src="./juicy1.mp3" preload="metadata"></audio>
+    <audio src="./mp3/juicy1.mp3" preload="metadata"></audio>
     <p>autoplay="autoplay"</p>
-    <audio src="./juicy2.mp3" autoplay></audio>
+    <audio src="./mp3/juicy2.mp3" autoplay></audio>
     <p>loop="loop"</p>
-    <audio src="./juicy3.mp3" loop></audio>
+    <audio src="./mp3/juicy3.mp3" loop></audio>
   </body>
 </html>
