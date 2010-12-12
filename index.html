@@ -20,15 +20,20 @@
       body .na { color: teal; }
       body .s { color: #D14; }
     </style>
-    <script src="./audio.min.js"></script>
+    <script src="./js/audio.min.js"></script>
     <script>
-      audiojs.events.ready(function() { audiojs.createAll(); });
+      audiojs.events.ready(function() { 
+        audiojs.createAll({
+          imageLocation: './images/player-graphics.gif',
+          swfLocation: './swf/audiojs.swf'
+        });
+      });
     </script>
   </head>
   <body>
     <h1>audio.js</h1>
     <p><a href="http://kolber.github.com/audiojs/docs/">http://kolber.github.com/audiojs/docs/</a></p>
-    <audio src="./juicy1.mp3" preload="auto"></audio>
+    <audio src="./demos/mp3/juicy1.mp3" preload="auto"></audio>
     <p>Usage</p>
 <pre>
 <span class="dim">&lt;!DOCTYPE html&gt;
