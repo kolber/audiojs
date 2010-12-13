@@ -1,34 +1,38 @@
 # audio.js
 
-A cross-browser `<audio>` player. It uses `<audio>` where available and provides
-a flash fallback for other browsers. It provides a consistent html player to
-all browsers, which can be styled used standard css.
+audiojs is a drop-in javascript library that allows HTML5's `<audio>` tag to
+be used anywhere. It uses native `<audio>` where available and falls back
+to an invisible flash player to emulate it for other browsers. It also serves
+a consistent html player UI to all browsers which can be styled used standard css.
 
 It plays mp3s. **No ogg**. Because, lets be honest, in the real world, no one
 really exports ogg files. Sadly, that means Opera and Firefox get flash audio.
-Hopefully they add mp3 support soon.
+Hopefully they can add mp3 support soon.
 
 ## Usage
 
-Put `audio.js`, `player-graphics.gif` & `audiojs.swf` in the same folder.
+1. Put `audio.js`, `player-graphics.gif` & `audiojs.swf` in the same folder.
 
-Include `audio.js`:
-    <script src="/audiojs/audio.js"></script>
+2. Include `audio.js`:
 
-Initialise `audiojs`:
-    <script>
-      audiojs.events.ready(function() {
-        var as = audiojs.createAll();
-      });
-    </script>
+        <script src="/audiojs/audio.js"></script>
 
-Then you can use `<audio>` wherever you like in your HTML:
-    <audio src="/mp3/juicy.mp3" preload="auto" />
+3. Initialise audiojs:
+
+        <script>
+          audiojs.events.ready(function() {
+            var as = audiojs.createAll();
+          });
+        </script>
+
+4. Then you can use `<audio>` wherever you like in your HTML:
+
+        <audio src="/mp3/juicy.mp3" preload="auto" />
 
 
 ## Bugs / Contributions
 
-- Report a bug
+- [Report a bug](https://github.com/kolber/audiojs/issues)
 - To contribute or send an idea, github message me or fork the project
 
 ## Build
