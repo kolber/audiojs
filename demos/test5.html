@@ -31,13 +31,11 @@
       .track-details em { font-style: normal; color: #999; }
     </style>
     <script src="./jquery.js"></script>
-    <script src="../js/audio.js"></script>
+    <script src="../audiojs/audio.js"></script>
     <script>
       var a = audiojs;
       a.events.ready(function() {
         var a1 = a.createAll({
-          imageLocation: '../images/player-graphics.gif',
-          swfLocation: '../swf/audiojs.swf',
           css: '',
           createPlayer: {
             playPauseClass: 'play-pause',

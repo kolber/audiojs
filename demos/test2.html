@@ -38,15 +38,13 @@
       .audiojs .loadingZZ { display: none; position: absolute; top: 3px; left: 8px; }
 
     </style>
-    <script src="../js/audio.js"></script>
+    <script src="../audiojs/audio.js"></script>
     <script>
       audiojs.events.ready(function() {
         var audios = document.getElementsByTagName('audio');
 
         var a1 = audiojs.create(audios[0], {
           css: false,
-          imageLocation: '../images/player-graphics.gif',
-          swfLocation: '../swf/audiojs.swf',
           createPlayer: {
             markup: false,
             playPauseClass: 'play_pauseZ',
@@ -62,14 +60,9 @@
           }
         });
 
-        var a2 = audiojs.create(audios[1], {
-          imageLocation: '../images/player-graphics.gif',
-          swfLocation: '../swf/audiojs.swf'
-        });
+        var a2 = audiojs.create(audios[1]);
 
         var a3 = audiojs.create(audios[2], {
-          imageLocation: '../images/player-graphics.gif',
-          swfLocation: '../swf/audiojs.swf',
           createPlayer: {
             markup: '<div class="play_pauseZZ"><p class="playZZ">▶</p><p class="pauseZZ">❙ ❙</p></div><div class="scrubberZZ"><div class="progressZZ"></div><div class="loadedZZ"></div></div><div class="timeZZ"><em class="playedZZ">00:00</em>/<strong class="durationZZ">00:00</strong></div><div class="loadingZZ">Loading...</div>',
             playPauseClass: 'play_pauseZZ',

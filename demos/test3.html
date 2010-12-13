@@ -6,13 +6,10 @@
     <style>
       p { clear: both; }
     </style>
-    <script src="../js/audio.js"></script>
+    <script src="../audiojs/audio.js"></script>
     <script>
       audiojs.events.ready(function() {
-        audiojs.createAll({
-          imageLocation: '../images/player-graphics.gif',
-          swfLocation: '../swf/audiojs.swf'
-        });
+        audiojs.createAll();
       });
     </script>
   </head>

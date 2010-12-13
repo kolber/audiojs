@@ -26,13 +26,11 @@
         -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); -o-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
     </style>
     <script src="./jquery.js"></script>
-    <script src="../js/audio.js"></script>
+    <script src="../audiojs/audio.js"></script>
     <script>
       $(function() { 
         // Setup the player to autoplay the next track
         var a = audiojs.createAll({
-          imageLocation: '../images/player-graphics.gif',
-          swfLocation: '../swf/audiojs.swf',
           trackEnded: function() {
             var next = $('ol li.playing').next();
             if (!next.length) next = $('ol li').first();
