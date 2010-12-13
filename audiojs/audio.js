@@ -1,6 +1,15 @@
 // A cross-browser javascript shim for html5 audio
 (function(audiojs, audiojsInstance, container) {
-
+  // Use the path to the audio.js file to create relative paths to the swf and player graphics
+  var path = (function() {
+    var scripts = document.getElementsByTagName('script');
+    for (var i = 0, ii = scripts.length; i < ii; i++) {
+      var re = new RegExp('audio(\.min)?\.js'),
+          path = scripts[i].getAttribute('src');
+      if(re.test(path)) return path.replace(re, '');
+    }
+  })();
+  
   // ##The audiojs interface
   // This is the global object which provides an interface for creating new `audiojs` instances.
   // It also stores all of the construction helper methods and variables.
@@ -24,8 +33,8 @@
       autoplay: false,
       loop: false,
       preload: true,
-      imageLocation: './player-graphics.gif',
-      swfLocation: './audiojs.swf',
+      imageLocation: path + 'player-graphics.gif',
+      swfLocation: path + 'audiojs.swf',
       useFlash: (function() {
         var a = document.createElement('audio');
         return !(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''));

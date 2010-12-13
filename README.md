@@ -2,23 +2,20 @@
 
 ## Usage
 
-Put `player-graphics.gif` & `audiojs.swf` somewhere meaningful.
+Put `audio.js`, `player-graphics.gif` & `audiojs.swf` in the same folder.
 
-Include audio.js:
-    <script src="/js/audio.js"></script>
+Include `audio.js`:
+    <script src="/audiojs/audio.js"></script>
 
-Initialise audio.js :
+Initialise `audiojs`:
     <script>
       audiojs.events.ready(function() {
-        var as = audiojs.createAll({
-          imageLocation: '/images/player-graphics.gif',
-          swfLocation: '/swf/audiojs.swf'
-        });
+        var as = audiojs.createAll();
       });
     </script>
 
-HTML:
-    <audio src="/mp3/juicy.mp3" preload="auto"></audio>
+Then you can use `<audio>` wherever you like in your HTML:
+    <audio src="/mp3/juicy.mp3" preload="auto" />
 
 ## Compiling Flash from the command line
 
@@ -38,6 +35,6 @@ directly from the command line. It makes life that little bit less painful.
 
 ### Compiling the SWF
 
-Run the following command from within the `swf` folder.
+Run the following command from within the `audiojs` folder.
 
     mxmlc audiojs.as
