@@ -33,9 +33,11 @@ HTML:
 
 ## Build
 
-If you're on a mac, run rake compile — You'll need the
-[google closure compiler](http://code.google.com/closure/compiler/) installed,
-but it will package `audio.js` into `audio.min.js`.
+On OSX, you should install [closure compiler]() following the instructions in
+[Ben's gist](https://gist.github.com/739724).
+
+Then you can run `rake compile` from root directory and it will package `audio.js`
+into `audio.min.js`.
 
 ## Compiling Flash from the command line
 
