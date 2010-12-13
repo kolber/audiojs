@@ -10,19 +10,19 @@ Hopefully they add mp3 support soon.
 
 ## Usage
 
-Put `audio.min.js`, `player-graphics.gif` & `audiojs.swf` in the same folder.
+Put `audio.js`, `player-graphics.gif` & `audiojs.swf` in the same folder.
 
 Include `audio.js`:
-    <script src="/audiojs/audio.min.js"></script>
+    <script src="/audiojs/audio.js"></script>
 
-Initialise `audio.js`:
+Initialise `audiojs`:
     <script>
       audiojs.events.ready(function() {
         var as = audiojs.createAll();
       });
     </script>
 
-HTML:
+Then you can use `<audio>` wherever you like in your HTML:
     <audio src="/mp3/juicy.mp3" preload="auto" />
 
 
