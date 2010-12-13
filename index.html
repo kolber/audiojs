@@ -22,38 +22,32 @@
       body .na { color: teal; }
       body .s { color: #D14; }
     </style>
-    <script src="./js/audio.min.js"></script>
+    <script src="./audiojs/audio.js"></script>
     <script>
       audiojs.events.ready(function() { 
-        audiojs.createAll({
-          imageLocation: './images/player-graphics.gif',
-          swfLocation: './swf/audiojs.swf'
-        });
+        audiojs.createAll();
       });
     </script>
   </head>
   <body>
     <h1>audio.js</h1>
     <p><a href="http://kolber.github.com/audiojs/docs/">http://kolber.github.com/audiojs/docs/</a></p>
-    <audio src="./demos/mp3/juicy1.mp3" preload="auto"></audio>
+    <audio src="http://kolber.github.com/audiojs/demos/mp3/juicy1.mp3" preload="auto"></audio>
     <p>Usage</p>
 <pre>
 <span class="dim">&lt;!DOCTYPE html&gt;
 &lt;head&gt;
   &lt;meta charset="utf-8"&gt;
   &lt;title&gt;audio.js&lt;/title&gt;</span>
-  <span class="nt">&lt;script</span> <span class="na">src=</span><span class="s">&quot;/js/audio.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+  <span class="nt">&lt;script</span> <span class="na">src=</span><span class="s">&quot;/audiojs/audio.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
   <span class="nt">&lt;script&gt;</span>
     <span class="nb">audiojs</span>.events.ready(<span class="kd">function</span>() {
-      <span class="nb">audiojs</span>.createAll({
-        imageLocation: <span class="s1">'/images/player-graphics.gif'</span>,
-        swfLocation: <span class="s1">'/swf/audiojs.swf'</span>
-      });
+      <span class="nb">audiojs</span>.createAll();
     });
   <span class="nt">&lt;/script&gt;</span>
 <span class="dim">&lt;/head&gt;
 &lt;body&gt;</span>
-  <span class="nt">&lt;audio</span> <span class="na">src=</span><span class="s">&quot;/mp3s/juicy.mp3&quot;</span> <span class="na">preload=</span><span class="s">&quot;auto&quot;</span><span class="nt">/&gt;&lt;/audio&gt;</span>
+  <span class="nt">&lt;audio</span> <span class="na">src=</span><span class="s">&quot;/mp3s/juicy.mp3&quot;</span> <span class="na">preload=</span><span class="s">&quot;auto&quot;</span><span class="nt"> /&gt;</span>
 <span class="dim">&lt;/body&gt;</span>
 </pre>
   <p>Demos</p>
