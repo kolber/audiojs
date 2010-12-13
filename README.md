@@ -29,7 +29,6 @@ Hopefully they can add mp3 support soon.
 
         <audio src="/mp3/juicy.mp3" preload="auto" />
 
-
 ## Bugs / Contributions
 
 - [Report a bug](https://github.com/kolber/audiojs/issues)
