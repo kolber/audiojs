@@ -208,7 +208,7 @@
       else element.parentNode.setAttribute('id', wrapperId);
 
       // Return a new `audiojs` instance.
-      var audio = container[audiojsInstance].apply(element, [s]);
+      var audio = new container[audiojsInstance](element, s);
 
       // If css has been passed in, dynamically inject it into the `<head>`.
       if (s.css) this.helpers.injectCss(audio, s.css);
@@ -536,96 +536,95 @@
 
   // ## The audiojs class
   // We create one of these per `<audio>` and then push them into `audiojs['instances']`.
-  container[audiojsInstance] = function(settings) {
-    // First check the `<audio>` element directly for a src and if one is not found, look for a `<source>` element.
-    var mp3 = (function(audio) {
-      var source = audio.getElementsByTagName('source')[0];
-      return audio.getAttribute('src') || (source ? source.getAttribute('src') : null);
-    })(this);
+  container[audiojsInstance] = function(element, settings) {
     // Each audio instance returns an object which contains an API back into the `<audio>` element.
-    return {
-      // Storage properties:
-      element: this,
-      wrapper: this.parentNode,
-      source: this.getElementsByTagName('source')[0] || this,
-      mp3: mp3,
-      settings: settings,
-      loadStartedCalled: false,
-      loadedPercent: 0,
-      duration: 1,
-      playing: false,
-      // API access events:  
-      // Each of these do what they need do and then call the matching methods defined in the settings object.
-      updatePlayhead: function() {
-        var percent = this.element.currentTime / this.duration;
-        this.settings.updatePlayhead.apply(this, [percent]);
-      },
-      skipTo: function(percent) {
-        if (percent > this.loadedPercent) return;
-        this.element.currentTime = this.duration * percent;
-        this.updatePlayhead();
-      },
-      load: function(mp3) {
-        this.loadStartedCalled = false;
-        this.source.setAttribute('src', mp3);
-        this.mp3 = mp3;
-        container[audiojs].events.trackLoadProgress(this);
-      },
-      loadError: function() {
-        this.settings.loadError.apply(this);
-      },
-      init: function() {
-        this.settings.init.apply(this);
-      },
-      loadStarted: function() {
-        // Wait until `element.duration` exists before setting up the audio player.
-        if (!this.element.duration) return false;
+    this.element = element;
+    this.wrapper = element.parentNode;
+    this.source = element.getElementsByTagName('source')[0] || element;
+    // First check the `<audio>` element directly for a src and if one is not found, look for a `<source>` element.
+    this.mp3 = (function(element) {
+      var source = element.getElementsByTagName('source')[0];
+      return element.getAttribute('src') || (source ? source.getAttribute('src') : null);
+    })(element);
+    this.settings = settings;
+    this.loadStartedCalled = false;
+    this.loadedPercent = 0;
+    this.duration = 1;
+    this.playing = false;
+  }
 
-        this.duration = this.element.duration;
-        this.updatePlayhead();
-        this.settings.loadStarted.apply(this);
-      },
-      loadProgress: function() {
-        if (this.element.buffered != undefined && this.element.buffered.length) {
-          // Ensure `loadStarted()` is only called once.
-          if (!this.loadStartedCalled) {
-            this.loadStartedCalled = this.loadStarted();
-          }
-          var durationLoaded = this.element.buffered.end(this.element.buffered.length - 1);
-          this.loadedPercent = durationLoaded / this.duration;
+  container[audiojsInstance].prototype = {
+    // API access events:
+    // Each of these do what they need do and then call the matching methods defined in the settings object.
+    updatePlayhead: function() {
+      var percent = this.element.currentTime / this.duration;
+      this.settings.updatePlayhead.apply(this, [percent]);
+    },
+    skipTo: function(percent) {
+      if (percent > this.loadedPercent) return;
+      this.element.currentTime = this.duration * percent;
+      this.updatePlayhead();
+    },
+    load: function(mp3) {
+      this.loadStartedCalled = false;
+      this.source.setAttribute('src', mp3);
+      this.mp3 = mp3;
+      container[audiojs].events.trackLoadProgress(this);
+    },
+    loadError: function() {
+      this.settings.loadError.apply(this);
+    },
+    init: function() {
+      this.settings.init.apply(this);
+    },
+    loadStarted: function() {
+      // Wait until `element.duration` exists before setting up the audio player.
+      if (!this.element.duration) return false;
 
-          this.settings.loadProgress.apply(this, [this.loadedPercent]);
+      this.duration = this.element.duration;
+      this.updatePlayhead();
+      this.settings.loadStarted.apply(this);
+    },
+    loadProgress: function() {
+      if (this.element.buffered != null && this.element.buffered.length) {
+        // Ensure `loadStarted()` is only called once.
+        if (!this.loadStartedCalled) {
+          this.loadStartedCalled = this.loadStarted();
         }
-      },
-      playPause: function() {
-        if (this.playing) this.pause();
-        else this.play();
-      },
-      play: function() {
-        var ios = (/(ipod|iphone|ipad)/i).test(navigator.userAgent);
-        // On iOS this interaction will trigger loading the mp3, so run init.
-        if (ios && this.element.readyState == 0) this.init.apply(this);
-        // If the audio hasn't started preloading, then start it now.  
-        // Then set `preload` to `true`, so that any tracks loaded in subsequently are loaded straight away.
-        if (!this.settings.preload) {
-          this.settings.preload = true;
-          this.element.setAttribute('preload', 'auto');
-          container[audiojs].events.trackLoadProgress(this);
-        }
-        this.playing = true;
-        this.element.play();
-        this.settings.play.apply(this);
-      },
-      pause: function() {
-        this.playing = false;
-        this.element.pause();
-        this.settings.pause.apply(this);
-      },
-      trackEnded: function(e) {
-        this.skipTo.apply(this, [0]);
-        if (!this.settings.loop) this.pause.apply(this);
-        this.settings.trackEnded.apply(this);
+        var durationLoaded = this.element.buffered.end(this.element.buffered.length - 1);
+        this.loadedPercent = durationLoaded / this.duration;
+
+        this.settings.loadProgress.apply(this, [this.loadedPercent]);
       }
+    },
+    playPause: function() {
+      if (this.playing) this.pause();
+      else this.play();
+    },
+    play: function() {
+      var ios = (/(ipod|iphone|ipad)/i).test(navigator.userAgent);
+      // On iOS this interaction will trigger loading the mp3, so run `init()`.
+      if (ios && this.element.readyState == 0) this.init.apply(this);
+      // If the audio hasn't started preloading, then start it now.  
+      // Then set `preload` to `true`, so that any tracks loaded in subsequently are loaded straight away.
+      if (!this.settings.preload) {
+        this.settings.preload = true;
+        this.element.setAttribute('preload', 'auto');
+        container[audiojs].events.trackLoadProgress(this);
+      }
+      this.playing = true;
+      this.element.play();
+      this.settings.play.apply(this);
+    },
+    pause: function() {
+      this.playing = false;
+      this.element.pause();
+      this.settings.pause.apply(this);
+    },
+    trackEnded: function(e) {
+      this.skipTo.apply(this, [0]);
+      if (!this.settings.loop) this.pause.apply(this);
+      this.settings.trackEnded.apply(this);
     }
   }
 
