@@ -36,7 +36,7 @@ Hopefully they can add mp3 support soon.
 
 ## Build
 
-On OSX, you should install [closure compiler]() following the instructions in
+On OSX, you should install [closure compiler](http://closure-compiler.googlecode.com/files/compiler-latest.zip) following the instructions in
 [Ben's gist](https://gist.github.com/739724).
 
 Then you can run `rake compile` from root directory and it will package `audio.js`
