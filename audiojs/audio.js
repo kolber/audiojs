@@ -2,10 +2,10 @@
 (function(audiojs, audiojsInstance, container) {
   // Use the path to the audio.js file to create relative paths to the swf and player graphics
   var path = (function() {
-    var scripts = document.getElementsByTagName('script');
+    var re = new RegExp('audio(\.min)?\.js'),
+        scripts = document.getElementsByTagName('script');
     for (var i = 0, ii = scripts.length; i < ii; i++) {
-      var re = new RegExp('audio(\.min)?\.js'),
-          path = scripts[i].getAttribute('src');
+      var path = scripts[i].getAttribute('src');
       if(re.test(path)) return path.replace(re, '');
     }
   })();
@@ -68,8 +68,7 @@
         loadingClass: 'loading',
         errorClass: 'error'
       },
-      // ### String storage
-      // The css required by the default player. This is is dynamically injected into a `<style>` tag in the top of the head.
+      // The css used by the default player. This is is dynamically injected into a `<style>` tag in the top of the head.
       css: '\
         .audiojs audio { position: absolute; left: -1px; } \
         .audiojs { width: 460px; height: 36px; background: #404040; overflow: hidden; font-family: monospace; font-size: 12px; \
@@ -198,8 +197,8 @@
           instanceCount = this.instanceCount++;
 
       // Check for `autoplay`, `loop` and `preload` attributes and write them into the settings.
-      if (element.getAttribute('autoplay') != undefined) s.autoplay = true;
-      if (element.getAttribute('loop') != undefined) s.loop = true;
+      if (element.getAttribute('autoplay') != null) s.autoplay = true;
+      if (element.getAttribute('loop') != null) s.loop = true;
       if (element.getAttribute('preload') == 'none') s.preload = false;
       // Merge the default settings with the user-defined `options`.
       if (options) this.helpers.merge(s, options);
@@ -234,10 +233,11 @@
       var wrapper = document.createElement('div'),
           newElement = element.cloneNode(true);
       wrapper.setAttribute('class', 'audiojs');
+      wrapper.setAttribute('className', 'audiojs');
       wrapper.setAttribute('id', id);
 
       // Fix IE's broken implementation of `innerHTML` & `cloneNode` for HTML5 elements.
-      if (newElement.outerHTML && (/<:audio/).test(newElement.outerHTML)) {
+      if (newElement.outerHTML && ~newElement.outerHTML.indexOf('<:audio')) {
         newElement = this.helpers.cloneHtml5Node(element);
         wrapper.innerHTML = player.markup;
         wrapper.appendChild(newElement);
@@ -404,11 +404,11 @@
 
         for (var i = 0, ii = styles.length; i < ii; i++) {
           var title = styles[i].getAttribute('title');
-          if (/audiojs/.test(title)) {
+          if (title && ~title.indexOf('audiojs')) {
             style = styles[i];
             prepend = style.innerHTML;
+            break;
           }
-          break;
         };
 
         style.setAttribute('type', 'text/css');
@@ -633,15 +633,15 @@
   // Having to rely on `getElementsByTagName` is pretty inflexible internally, so a modified version of Dustin Diaz's `getElementsByClassName` has been included.
   // This version cleans things up and prefers the native DOM method if it's available.
   var getByClass = function(searchClass, node, tag) {
-    var matches = [],
-        node = node || document,
-        tag = tag || '*',
-        els = node.getElementsByTagName(tag),
-        pattern = new RegExp("(^|\\s)"+searchClass+"(\\s|$)");
-
+    var matches = [];
     if (document.getElementsByClassName) {
       matches = node.getElementsByClassName(searchClass);
     } else {
+      var node = node || document,
+          tag = tag || '*',
+          els = node.getElementsByTagName(tag),
+          pattern = new RegExp("(^|\\s)"+searchClass+"(\\s|$)");
+
       for (i = 0, j = 0, l = els.length; i < l; i++) {
         if (pattern.test(els[i].className)) {
           matches[j] = els[i];
