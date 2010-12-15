@@ -568,6 +568,8 @@
     load: function(mp3) {
       this.loadStartedCalled = false;
       this.source.setAttribute('src', mp3);
+      // The now outdated `load()` method is required for Safari 4
+      this.element.load();
       this.mp3 = mp3;
       container[audiojs].events.trackLoadProgress(this);
     },
