@@ -10,6 +10,11 @@ task :commit_build do
   `git commit audiojs/audio.js -m "Closure compiled \`git rev-parse HEAD\`"`
 end
 
+desc "Zip up a release"
+task :release do
+  `cat Manifest | zip -9 -@ audiojs-\`date "+%d-%m-%Y"\`.zip`
+end
+
 #desc "Run the test suite"
 #task :test do
 #  `open -a Safari test/suite.html`
