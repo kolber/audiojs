@@ -11,7 +11,7 @@ h2 { font-family: 'bpreplay', sans-serif; font-weight: normal; font-size: 24px; 
 .download { background: url('./divider.png') top center no-repeat, url('./divider.png') bottom center no-repeat; margin: 30px 0px; padding: 20px 0px; text-align: center; }
 .download a em { color: rgba(255, 255, 255, 0.8); font-style: normal; }
 .download a em:before { content: '⬇ '; font-size: 0.8em; padding: 0px 4px 0px 0px; }
-.download a { display: block; color: #f6f6f0; width: 190px; margin: 5px auto; padding: 8px 2px 8px 0px; font-size: 14px; border-bottom: 0px;
+.download a { display: block; color: #f6f6f0; width: 190px; margin: 5px auto; padding: 8px 2px 8px 0px; font-size: 14px; border-bottom: 0px; background: #da1c5c;
   border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -o-border-radius: 5px;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.2, #da1c5c), color-stop(0.5, #C81C5C), color-stop(0.51, #da1c5c), color-stop(1, #da1c5c));
   background-image: -moz-linear-gradient(center top, #da1c5c 0%, #C81C5C 50%, #da1c5c 51%, #da1c5c 100%); }
