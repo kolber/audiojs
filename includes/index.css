@@ -1,0 +1,36 @@
+@font-face { font-family: 'bpreplay'; font-weight: normal; font-style: normal; src: url('BPreplay-webfont.eot'); src: local('☺'), url('BPreplay-webfont.woff') format('woff'), url('BPreplay-webfont.ttf') format('truetype'), url('BPreplay-webfont.svg#webfontgzJ8Cr4g') format('svg'); }
+
+body { width: 480px; margin: 40px auto; font-family: sans-serif; background: #f6f6f0; color: #330; line-height: 1.5; }
+header { display: block; background: url('./divider.png') bottom center no-repeat; padding: 10px 0px; margin: 0px 0px 20px; text-align: center; }
+h1 { display: inline; position: relative; margin: 0ex 0ex 1ex 1.2ex; font-family: 'bpreplay', sans-serif; font-weight: normal; font-size: 42px; letter-spacing: 1px; }
+h1:before { content: '♬ '; position: absolute; top: 16px; left: -3.1ex; color: #da1c5c; font-size: 0.4em; }
+
+.audiojs { margin: 15px 0px 20px; }
+h2 { font-family: 'bpreplay', sans-serif; font-weight: normal; font-size: 24px; margin-bottom: 10px; line-height: 1.6; }
+
+.download { background: url('./divider.png') top center no-repeat, url('./divider.png') bottom center no-repeat; margin: 30px 0px; padding: 20px 0px; text-align: center; }
+.download a em { color: rgba(255, 255, 255, 0.8); font-style: normal; }
+.download a em:before { content: '⬇ '; font-size: 0.8em; padding: 0px 4px 0px 0px; }
+.download a { display: block; color: #f6f6f0; width: 190px; margin: 5px auto; padding: 8px 2px 8px 0px; font-size: 14px; border-bottom: 0px;
+  border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -o-border-radius: 5px;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.2, #da1c5c), color-stop(0.5, #C81C5C), color-stop(0.51, #da1c5c), color-stop(1, #da1c5c));
+  background-image: -moz-linear-gradient(center top, #da1c5c 0%, #C81C5C 50%, #da1c5c 51%, #da1c5c 100%); }
+  
+h3 { margin: 30px 0px 8px; }
+
+p { font-size: 13px; margin: 0px 0px 5px; padding: 0px 0px 1px; }
+p em { font-style: normal; color: #C1BDB0; }
+a { color: #330; text-decoration: none; border-bottom: 1px solid; }
+
+ol { padding: 0px; font-size: 11px; color: #C5C1B3; }
+ol li p { color: #330; }
+
+pre,
+code { background: #EFEEE6; color: #552; font-family: Monaco, Consolas, 'Lucida Console', monospace; font-size: 12px; padding: 0px 3px; }
+pre { padding: 4px 8px; }
+
+footer { display: block; margin: 30px 0px 0px; color: #C1BDB0; text-align: center; }
+footer a { color: #C1BDB0; border-bottom: 1px solid; margin: 0px 3px; }
+footer em { display: block; font-size: 1.2em; font-style: normal; }
+footer .ab-c { font-family: 'Andale Mono', 'Courier New', courier; font-size: 0.75em; margin: 50px 0px 0px; padding: 20px 0px; border-top: 1px solid #EFEEE6; }
+footer .ab-c a { padding: 0px; }
