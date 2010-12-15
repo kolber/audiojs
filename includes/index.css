@@ -19,19 +19,23 @@ h2 { font-family: 'bpreplay', sans-serif; font-weight: normal; font-size: 24px; 
 h3 { margin: 30px 0px 8px; }
 
 p { font-size: 13px; margin: 0px 0px 5px; padding: 0px 0px 1px; }
-p em { font-style: normal; color: #b1aca0; }
+em { font-style: normal; color: #b1aca0; }
 a { color: #330; text-decoration: none; border-bottom: 1px solid; }
 
 ol { padding: 0px; font-size: 12px; color: #b1aca0; }
 ol li { margin: 0px 0px 20px; }
 ol li p { color: #330; }
 
+ul { font-size: 13px; margin: 6px 0px; padding: 0px; list-style: none; }
+ul li { position: relative; }
+ul li:before { content: '\2022'; position: absolute; left: -1.8ex; }
+
 pre,
 code { background: #EFEEE6; color: #552; font-family: Monaco, Consolas, 'Lucida Console', monospace; font-size: 12px; padding: 0px 3px; }
 pre { margin: 0px; padding: 4px 8px; }
 
 footer { display: block; margin: 30px 0px 0px; color: #b1aca0; text-align: center; margin: 50px 0px 0px; }
-footer a { color: #b1aca0; border-bottom: 1px solid; margin: 0px 3px; }
+footer a { color: #b1aca0; }
 footer em { display: block; font-size: 1.2em; font-style: normal; }
 footer .ab-c { font-family: 'Andale Mono', 'Courier New', courier; font-size: 0.75em; margin: 30px 0px 0px; padding: 20px 0px; border-top: 1px solid #EFEEE6; }
 footer .ab-c a { padding: 0px; }
