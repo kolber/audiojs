@@ -12,7 +12,7 @@ end
 
 desc "Zip up a release"
 task :release => :compile do
-  `cat Manifest | zip -9 -@ audiojs-\`date "+%d-%m-%Y"\`.zip`
+  `cat Manifest | zip -9 -@ audiojs.zip`
 end
 
 #desc "Run the test suite"
