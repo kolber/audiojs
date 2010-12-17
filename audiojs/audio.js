@@ -39,6 +39,20 @@
         var a = document.createElement('audio');
         return !(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''));
       })(),
+      hasFlash: (function() {
+        if (navigator.plugins && navigator.plugins.length && navigator.plugins['Shockwave Flash']) {
+          return true;
+        } else if (navigator.mimeTypes && navigator.mimeTypes.length) {
+          var mimeType = navigator.mimeTypes['application/x-shockwave-flash'];
+          return mimeType && mimeType.enabledPlugin;
+        } else {
+          try {
+            var ax = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+            return true;
+          } catch (e) {}
+        }
+        return false;
+      })(),
       // The default markup and classes for creating the player:
       createPlayer: {
         markup: '\
@@ -90,6 +104,7 @@
         .audiojs .time em { padding: 0px 2px 0px 0px; color: #f9f9f9; font-style: normal; } \
         .audiojs .time strong { padding: 0px 0px 0px 2px; font-weight: normal; } \
         .audiojs .error-message { float: left; display: none; margin: 0px 10px; height: 36px; line-height: 36px; color: #fff; } \
+        .audiojs .error-message a { color: #eee; text-decoration: none; padding-bottom: 1px; border-bottom: 1px solid #999; white-space: wrap; } \
         \
         .audiojs .play { background: url("$1") -2px -1px no-repeat; } \
         .audiojs .loading { background: url("$1") -2px -31px no-repeat; } \
@@ -108,6 +123,15 @@
         .error .error-message { display: block; }',
       // The default event callbacks:
       trackEnded: function(e) {},
+      flashError: function() {
+        var player = this.settings.createPlayer,
+            errorMessage = getByClass(player.errorMessageClass, this.wrapper),
+            html = 'Missing <a href="http://get.adobe.com/flashplayer/">flash player</a> plugin.';
+        if (this.mp3) html += ' <a href="'+this.mp3+'">Download audio file</a>.';
+        container[audiojs].helpers.removeClass(this.wrapper, player.loadingClass);
+        container[audiojs].helpers.addClass(this.wrapper, player.errorClass);
+        errorMessage.innerHTML = html;
+      },
       loadError: function(e) {
         var player = this.settings.createPlayer,
             errorMessage = getByClass(player.errorMessageClass, this.wrapper);
@@ -214,13 +238,15 @@
       if (s.css) this.helpers.injectCss(audio, s.css);
 
       // If `<audio>` or mp3 playback isn't supported, insert the swf & attach the required events for it.
-      if (s.useFlash) {
+      if (s.useFlash && s.hasFlash) {
         this.injectFlash(audio, id);
         this.attachFlashEvents(audio.wrapper, audio);
+      } else if (!s.hasFlash) {
+        this.settings.flashError.apply(audio);
       }
 
       // Attach event callbacks to the new audiojs instance.
-      this.attachEvents(audio.wrapper, audio);
+      if (!s.useFlash || (s.useFlash && s.hasFlash)) this.attachEvents(audio.wrapper, audio);
 
       // Store the newly-created `audiojs` instance.
       this.instances[id] = audio;
@@ -355,8 +381,7 @@
       // Inject the player markup using a more verbose `innerHTML` insertion technique that works with IE.
       var html = audio.wrapper.innerHTML,
           div = document.createElement('div');
-          div.innerHTML = flashSource + html;
-
+      div.innerHTML = flashSource + html;
       audio.wrapper.innerHTML = div.innerHTML;
       audio.element = this.helpers.getSwf(id);
     },
