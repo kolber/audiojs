@@ -11,7 +11,7 @@ task :commit_build do
 end
 
 desc "Zip up a release"
-task :release => :compile do
+task :zip do
   `cat Manifest | zip -9 -@ audiojs.zip`
 end
 
