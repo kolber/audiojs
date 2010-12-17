@@ -241,7 +241,7 @@
       if (s.useFlash && s.hasFlash) {
         this.injectFlash(audio, id);
         this.attachFlashEvents(audio.wrapper, audio);
-      } else if (!s.hasFlash) {
+      } else if (s.useFlash && !s.hasFlash) {
         this.settings.flashError.apply(audio);
       }
 
