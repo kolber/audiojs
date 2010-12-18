@@ -19,10 +19,9 @@
 
     <audio src="http://s3.amazonaws.com/audiojs/02-juicy-r.mp3" preload="auto"></audio>
 
-    <h2>audio.js is a drop-in javascript library that allows HTML5's &lt;audio&gt; tag to be used anywhere.</h2>
+    <h2>audio.js is a drop-in javascript library that allows HTML5’s &lt;audio&gt; tag to be used anywhere.</h2>
 
-    <p>It uses native &lt;audio&gt; where available and falls back to an invisible flash player to emulate it for other browsers. It provides a consistent html player UI to all browsers which can be styled used standard css.</audio>
-    <p>It plays mp3s. No ogg. Because, lets be honest, in the real world, no one really exports ogg files.</p>
+    <p>It uses native &lt;audio&gt; where available and an invisible flash player to emulate &lt;audio&gt; for other browsers. It provides a consistent html player UI to all browsers which can be styled used standard css.</audio>
 
     <div class="download">
       <a href="http://kolber.github.com/audiojs/audiojs.zip" class="button"><em>Download</em> audio.js</a>
@@ -55,9 +54,8 @@
     <p>A series of API tests & examples for using and extending audio.js</p>
     <p><em>Example 1</em> <a href="http://kolber.github.com/audiojs/demos/test6.html">Playlist player</a></p>
     <p><em>Example 2</em> <a href="http://kolber.github.com/audiojs/demos/test3.html">Multiple players, testing <code>preload</code>, <code>loop</code> & <code>autoplay</code> attributes</a></p>
-    
-    <h3>Browser support</h3>
-    
+
+    <h3>Browser & format support</h3>
     <p>With Flash as a fallback, it should work pretty much anywhere.<br>
       It has been verified to work across:</p>
     <ul>
@@ -68,6 +66,8 @@
       <li>Opera <em>(10+, w/ Flash)</em></li>
       <li>IE <em>(6, 7, 8, w/ Flash)</em></li>
     </ul>
+    <p><strong>ogg</strong></p>
+    <p>audio.js focuses on playing mp3s. It doesn’t currently support the ogg format. As mp3 is the current defacto music transfer format, ogg support is lower on our list of priorities.</p>
 
     <h3>Source code</h3>
     <p>All efforts have been made to keep the source as clean and readable as possible. Until we release more detailed documentation, the annotated source is the best reference for usage.</p>
