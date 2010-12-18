@@ -69,6 +69,13 @@
     <p><strong>ogg</strong></p>
     <p>audio.js focuses on playing mp3s. It doesn’t currently support the ogg format. As mp3 is the current defacto music transfer format, ogg support is lower on our list of priorities.</p>
 
+    <h3>Flash local security</h3>
+    <blockquote>
+      <p><strong>Note:</strong> For local content running in a browser, calls to the <code>ExternalInterface.addCallback()</code> method work only if the SWF file and the containing web page are in the local-trusted security sandbox.</p>
+      <cite><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/external/ExternalInterface.html#addCallback()">http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/external/ExternalInterface.html#addCallback()</a></cite>
+    </blockquote>
+    <p>This means that unless you have gone through the rigmarole of setting up your <a href="http://kb2.adobe.com/cps/093/4c093f20.html#main_blocked">flash player security settings for local files</a>, <code>ExternalInterface</code> calls will only work when the page is loaded from a ‘domain’. <code>http://localhost</code> counts, but any <code>file://</code> requests don’t.</p>
+
     <h3>Source code</h3>
     <p>All efforts have been made to keep the source as clean and readable as possible. Until we release more detailed documentation, the annotated source is the best reference for usage.</p>
     <p><a href="http://kolber.github.com/audiojs/docs/">Annotated source</a> / <a href="http://github.com/kolber/audiojs">Source on Github</a></p>

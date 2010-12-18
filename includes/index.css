@@ -21,6 +21,9 @@ h3 { margin: 30px 0px 8px; }
 p { font-size: 13px; margin: 0px 0px 5px; padding: 0px 0px 1px; }
 em { font-style: normal; color: #b1aca0; }
 a { color: #330; text-decoration: none; border-bottom: 1px solid; }
+blockquote { font-size: 13px; font-style: italic; border-left: 2px solid #b1aca0; padding: 0px 0px 2px 10px; margin: 0px 0px 10px; }
+cite:before { content: "From:\00a0"; }
+cite { border-top: 1px dotted #999; padding-top: 0.5em; display: block; word-wrap: break-word; }
 
 ol { padding: 0px; font-size: 12px; color: #b1aca0; }
 ol li { margin: 0px 0px 20px; }
