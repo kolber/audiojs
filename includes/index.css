@@ -19,7 +19,7 @@ h2 { font-family: 'bpreplay', sans-serif; font-weight: normal; font-size: 24px; 
 h3 { margin: 30px 0px 8px; }
 
 p { font-size: 13px; margin: 0px 0px 5px; padding: 0px 0px 1px; }
-p em { font-style: normal; color: #C1BDB0; }
+em { font-style: normal; color: #b1aca0; padding-right: 3px; }
 a { color: #330; text-decoration: none; border-bottom: 1px solid; }
 
 ol { padding: 0px; font-size: 11px; color: #C5C1B3; }
