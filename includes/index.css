@@ -19,7 +19,7 @@ h2 { font-family: 'bpreplay', sans-serif; font-weight: normal; font-size: 24px; 
 h3 { margin: 30px 0px 8px; }
 
 p { font-size: 13px; margin: 0px 0px 5px; padding: 0px 0px 1px; }
-em { font-style: normal; color: #b1aca0; }
+em { font-style: normal; color: #b1aca0; padding-right: 3px; }
 a { color: #330; text-decoration: none; border-bottom: 1px solid; }
 blockquote { font-size: 13px; font-style: italic; border-left: 2px solid #b1aca0; padding: 0px 0px 2px 10px; margin: 0px 0px 10px; }
 cite:before { content: "From:\00a0"; }
