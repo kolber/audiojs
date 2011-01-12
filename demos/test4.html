@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Test 4 - audio.js</title>
+    <style>
+      p { clear: both; }
+    </style>
+    <script src="../audiojs/audio.js"></script>
+    <script>
+      audiojs.events.ready(function() {
+        var as = audiojs.createAll();
+        as[1].load({
+          mp3: "http://s3.amazonaws.com/audiojs/02-juicy-r.mp3",
+          ogg: "http://s3.amazonaws.com/audiojs/02-juicy-r.ogg"
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>audiojs.create(element, settings)</h1>
+    <p>.ogg fallback</p>
+    <audio src="http://s3.amazonaws.com/audiojs/02-juicy-r.mp3" preload>
+      <source src="http://s3.amazonaws.com/audiojs/02-juicy-r.ogg">
+    </audio>
+    <p>Dynamically-loaded audio file with .ogg fallback</p>
+    <audio preload="none"></audio>
+  </body>
+</html>
