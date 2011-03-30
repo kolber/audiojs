@@ -1,8 +1,9 @@
 // A cross-browser javascript shim for html5 audio
 (function(audiojs, audiojsInstance, container) {
   // Use the path to the audio.js file to create relative paths to the swf and player graphics
+  // Remember that some systems (e.g. ruby on rails) append strings like '?1301478336' to asset paths
   var path = (function() {
-    var re = new RegExp('audio(\.min)?\.js'),
+    var re = new RegExp('audio(\.min)?\.js.*'),
         scripts = document.getElementsByTagName('script');
     for (var i = 0, ii = scripts.length; i < ii; i++) {
       var path = scripts[i].getAttribute('src');
