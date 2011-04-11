@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Test 6 - audio.js</title>
+    <style>
+      p { clear: both; }
+    </style>
+    <script src="../audiojs/audio.js"></script>
+    <script>
+      audiojs.events.ready(function() {
+        var as = audiojs.createAll(),
+            audio = as[0],
+            ids = ['vol-0', 'vol-10', 'vol-40', 'vol-70', 'vol-100'];
+        for (var i = 0, ii = ids.length; i < ii; i++) {
+          var elem = document.getElementById(ids[i]),
+              volume = ids[i].split('-')[1];
+          elem.setAttribute('data-volume', volume / 100)
+          elem.onclick = function(e) {
+            audio.setVolume(this.getAttribute('data-volume'));
+            e.preventDefault();
+            return false;
+          }
+        }
+        
+      });
+    </script>
+  </head>
+  <body>
+    <h1>audiojs.create(element, settings)</h1>
+    <p>Volume</p>
+    <audio src="http://s3.amazonaws.com/audiojs/02-juicy-r.mp3"></audio>
+    <p><a href="#" id="vol-0">Volume: 0.0</a></p>
+    <p><a href="#" id="vol-10">Volume: 0.1</a></p>
+    <p><a href="#" id="vol-40">Volume: 0.4</a></p>
+    <p><a href="#" id="vol-70">Volume: 0.7</a></p>
+    <p><a href="#" id="vol-100">Volume: 1.0</a></p>
+  </body>
+</html>

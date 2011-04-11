@@ -5,6 +5,7 @@ import flash.external.ExternalInterface;
 import flash.net.URLRequest;
 import flash.media.Sound;
 import flash.media.SoundChannel;
+import flash.media.SoundTransform;
 import flash.events.Event;
 import flash.errors.IOError;
 import flash.events.IOErrorEvent;
@@ -22,6 +23,7 @@ public class audiojs extends Sprite {
 
   private var pausePoint:Number = 0;
   private var playing:Boolean = false;
+  private var volume:Number = 1;
   private var timer:Timer = new Timer(250, 0);
 
 
@@ -45,6 +47,7 @@ public class audiojs extends Sprite {
     ExternalInterface.addCallback('pplay', play);
     ExternalInterface.addCallback('ppause', pause);
     ExternalInterface.addCallback('skipTo', skipTo);
+    ExternalInterface.addCallback('setVolume', setVolume);
 
     ExternalInterface.call(this.playerInstance+'loadStarted');
   }
@@ -94,8 +97,9 @@ public class audiojs extends Sprite {
 
   private function play():void {
     this.channel = this.sound.play(this.pausePoint);
-		this.playing = true;
-		this.timer.start();
+    this.setVolume(this.volume);
+    this.playing = true;
+    this.timer.start();
   }
 
   private function pause():void {
@@ -118,9 +122,19 @@ public class audiojs extends Sprite {
     this.pausePoint = this.duration * percent;
     if (this.playing) {
       this.channel = this.sound.play(this.pausePoint);
+      this.setVolume(this.volume);
     } else {
       this.updatePlayhead();
     }
+  }
+
+  private function setVolume(vol:Number):void {
+    this.volume = vol;
+    var transform:SoundTransform = this.channel.soundTransform;
+    if (vol < 0) vol = 0;
+    if (vol > 1) vol = 1;
+    transform.volume = vol;
+    channel.soundTransform = transform;
   }
 
   private function soundEnded(e:Event):void {
