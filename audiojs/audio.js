@@ -281,6 +281,7 @@
 
     // Attaches useful event callbacks to an `audiojs` instance.
     attachEvents: function(wrapper, audio) {
+      if (!audio.settings.createPlayer) return;
       var player = audio.settings.createPlayer,
           playPause = getByClass(player.playPauseClass, wrapper),
           scrubber = getByClass(player.scrubberClass, wrapper),
