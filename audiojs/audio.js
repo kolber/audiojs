@@ -541,26 +541,33 @@
 
       // **DOMready function**  
       // As seen here: <http://webreflection.blogspot.com/2007/09/whats-wrong-with-new-iecontentloaded.html>.
-      ready: (function(ie) {
-        var d = document;
-        return ie ? function(c){
-          var n = d.firstChild,
-              f = function(){
-                try{ c(n.doScroll('left')) }
-                catch(e){ setTimeout(f, 10) }
-              };
-              f()
-        } :
-        /webkit|safari|khtml/i.test(navigator.userAgent) ? function(c){
-          var f = function(){
-            /loaded|complete/.test(d.readyState) ? c() : setTimeout(f, 10)
-          };
-          f();
-        } :
-        function(c){
-          d.addEventListener('DOMContentLoaded', c, false);
+      ready: (function() { return function(fn) {
+        var win = window, done = false, top = true,
+        doc = win.document, root = doc.documentElement,
+        add = doc.addEventListener ? 'addEventListener' : 'attachEvent',
+        rem = doc.addEventListener ? 'removeEventListener' : 'detachEvent',
+        pre = doc.addEventListener ? '' : 'on',
+        init = function(e) {
+          if (e.type == 'readystatechange' && doc.readyState != 'complete') return;
+          (e.type == 'load' ? win : doc)[rem](pre + e.type, init, false);
+          if (!done && (done = true)) fn.call(win, e.type || e);
+        },
+        poll = function() {
+          try { root.doScroll('left'); } catch(e) { setTimeout(poll, 50); return; }
+          init('poll');
+        };
+        if (doc.readyState == 'complete') fn.call(win, 'lazy');
+        else {
+          if (doc.createEventObject && root.doScroll) {
+            try { top = !win.frameElement; } catch(e) { }
+            if (top) poll();
+          }
+          doc[add](pre + 'DOMContentLoaded', init, false);
+          doc[add](pre + 'readystatechange', init, false);
+          win[add](pre + 'load', init, false);
         }
-      })(/*@cc_on 1@*/)
+      }
+      })()
 
     }
   }
