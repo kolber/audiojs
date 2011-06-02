@@ -540,7 +540,7 @@
       },
 
       // **DOMready function**  
-      // As seen here: <http://webreflection.blogspot.com/2007/09/whats-wrong-with-new-iecontentloaded.html>.
+      // As seen here: <https://github.com/dperini/ContentLoaded/>.
       ready: (function() { return function(fn) {
         var win = window, done = false, top = true,
         doc = win.document, root = doc.documentElement,
