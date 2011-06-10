@@ -420,24 +420,27 @@
       // **Dynamic CSS injection**  
       // Takes a string of css, inserts it into a `<style>`, then injects it in at the very top of the `<head>`. This ensures any user-defined styles will take precedence.
       injectCss: function(audio, string) {
-        var head = document.getElementsByTagName('head')[0],
-            firstchild = head.firstChild,
-            style = document.createElement('style'),
-            css = string.replace(/\$1/g, audio.settings.imageLocation);
 
-        if (!head) return;
         // If an `audiojs` `<style>` tag already exists, then append to it rather than creating a whole new `<style>`.
         var prepend = '',
-            styles = document.getElementsByTagName('style');
+            styles = document.getElementsByTagName('style'),
+            css = string.replace(/\$1/g, audio.settings.imageLocation);
 
         for (var i = 0, ii = styles.length; i < ii; i++) {
           var title = styles[i].getAttribute('title');
           if (title && ~title.indexOf('audiojs')) {
             style = styles[i];
+            if (style.innerHTML === css) return;
             prepend = style.innerHTML;
             break;
           }
         };
+
+        var head = document.getElementsByTagName('head')[0],
+            firstchild = head.firstChild,
+            style = document.createElement('style');
+
+        if (!head) return;
 
         style.setAttribute('type', 'text/css');
         style.setAttribute('title', 'audiojs');
