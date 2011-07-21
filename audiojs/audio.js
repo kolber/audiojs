@@ -265,7 +265,7 @@
       wrapper.setAttribute('id', id);
 
       // Fix IE's broken implementation of `innerHTML` & `cloneNode` for HTML5 elements.
-      if (newElement.outerHTML && ~newElement.outerHTML.indexOf('<:audio')) {
+	  if (newElement.outerHTML && !document.createElement('audio').canPlayType) {
         newElement = this.helpers.cloneHtml5Node(element);
         wrapper.innerHTML = player.markup;
         wrapper.appendChild(newElement);
