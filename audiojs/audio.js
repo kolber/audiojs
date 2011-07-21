@@ -485,9 +485,11 @@
           this.listeners.push(element);
           if (!this.memoryLeaking) {
             window.attachEvent('onunload', function() {
-              for (var i = 0, ii = this.listeners.length; i < ii; i++) {
-                container[audiojs].events.purge(this.listeners[i]);
-              }
+			  if(this.listeners) {
+				for (var i = 0, ii = this.listeners.length; i < ii; i++) {
+					container[audiojs].events.purge(this.listeners[i]);
+				}
+			  }
             });
             this.memoryLeaking = true;
           }
