@@ -366,6 +366,9 @@
         audio.element.ppause();
         audio.settings.pause.apply(audio);
       }
+      audio['setVolume'] = function(v) {
+        audio.element.setVolume(v);
+      }
       audio['loadStarted'] = function() {
         // Load the mp3 specified by the audio element into the swf.
         audio.swfReady = true;
@@ -482,9 +485,11 @@
           this.listeners.push(element);
           if (!this.memoryLeaking) {
             window.attachEvent('onunload', function() {
-              for (var i = 0, ii = this.listeners.length; i < ii; i++) {
-                container[audiojs].events.purge(this.listeners[i]);
-              }
+			  if(this.listeners) {
+				for (var i = 0, ii = this.listeners.length; i < ii; i++) {
+					container[audiojs].events.purge(this.listeners[i]);
+				}
+			  }
             });
             this.memoryLeaking = true;
           }
@@ -660,6 +665,9 @@
       this.playing = false;
       this.element.pause();
       this.settings.pause.apply(this);
+    },
+    setVolume: function(v) {
+      this.element.volume = v;
     },
     trackEnded: function(e) {
       this.skipTo.apply(this, [0]);
