@@ -265,7 +265,7 @@
       wrapper.setAttribute('id', id);
 
       // Fix IE's broken implementation of `innerHTML` & `cloneNode` for HTML5 elements.
-	  if (newElement.outerHTML && !document.createElement('audio').canPlayType) {
+      if (newElement.outerHTML && !document.createElement('audio').canPlayType) {
         newElement = this.helpers.cloneHtml5Node(element);
         wrapper.innerHTML = player.markup;
         wrapper.appendChild(newElement);
@@ -485,11 +485,11 @@
           this.listeners.push(element);
           if (!this.memoryLeaking) {
             window.attachEvent('onunload', function() {
-			  if(this.listeners) {
-				for (var i = 0, ii = this.listeners.length; i < ii; i++) {
-					container[audiojs].events.purge(this.listeners[i]);
-				}
-			  }
+              if(this.listeners) {
+                for (var i = 0, ii = this.listeners.length; i < ii; i++) {
+                  container[audiojs].events.purge(this.listeners[i]);
+                }
+              }
             });
             this.memoryLeaking = true;
           }
