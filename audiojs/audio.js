@@ -679,24 +679,24 @@
   // **getElementsByClassName**  
   // Having to rely on `getElementsByTagName` is pretty inflexible internally, so a modified version of Dustin Diaz's `getElementsByClassName` has been included.
   // This version cleans things up and prefers the native DOM method if it's available.
-  var getByClass = function(searchClass, node, tag) {
+  var getByClass = function(searchClass, node) {
     var matches = [];
-    if (document.getElementsByClassName) {
+    node = node || document;
+
+    if (node.getElementsByClassName) {
       matches = node.getElementsByClassName(searchClass);
     } else {
-      var node = node || document,
-          tag = tag || '*',
-          els = node.getElementsByTagName(tag),
+      var i, l, 
+          els = node.getElementsByTagName("*"),
           pattern = new RegExp("(^|\\s)"+searchClass+"(\\s|$)");
 
-      for (i = 0, j = 0, l = els.length; i < l; i++) {
+      for (i = 0, l = els.length; i < l; i++) {
         if (pattern.test(els[i].className)) {
-          matches[j] = els[i];
-          j++;
+          matches.push(els[i]);
         }
       }
     }
     return matches.length > 1 ? matches : matches[0];
-  }
+  };
 // The global variable names are passed in here and can be changed if they conflict with anything else.
 })('audiojs', 'audiojsInstance', this);
