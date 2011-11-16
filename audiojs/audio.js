@@ -458,8 +458,8 @@
       // Create a html5-safe document fragment by injecting an `<audio>` element into the document fragment.
       cloneHtml5Node: function(audioTag) {
         var fragment = document.createDocumentFragment();
-        fragment.createElement('audio');
-        var div = fragment.createElement('div');
+        document.createElement('audio');
+        var div = document.createElement('div');
         fragment.appendChild(div);
         div.innerHTML = audioTag.outerHTML;
         return div.firstChild;
