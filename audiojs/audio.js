@@ -457,8 +457,8 @@
       // **Handle all the IE6+7 requirements for cloning `<audio>` nodes**  
       // Create a html5-safe document fragment by injecting an `<audio>` element into the document fragment.
       cloneHtml5Node: function(audioTag) {
-        var fragment = document.createDocumentFragment()
-		    doc = fragment.createElement ? fragment : document;
+        var fragment = document.createDocumentFragment(),
+            doc = fragment.createElement ? fragment : document;
         doc.createElement('audio');
         var div = doc.createElement('div');
         fragment.appendChild(div);
