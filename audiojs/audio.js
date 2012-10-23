@@ -452,7 +452,7 @@
         else style.appendChild(document.createTextNode(prepend + css));
 
         if (firstchild) head.insertBefore(style, firstchild);
-        else head.appendChild(styleElement);
+        else head.appendChild(style);
       },
       // **Handle all the IE6+7 requirements for cloning `<audio>` nodes**  
       // Create a html5-safe document fragment by injecting an `<audio>` element into the document fragment.
