@@ -29,6 +29,25 @@ Hopefully they can add mp3 support soon.
 
         <audio src="/mp3/juicy.mp3" preload="auto" />
 
+## Options
+
+You can customize several options:
+
+    <script>
+      var settings: {
+        autoplay: false, // If you want it to start playing when the document loads
+        loop: false, // The audio will be repeated
+        preload: true, // Check this if you want the song to be preloaded
+        imageLocation: path + 'player-graphics.gif', // Change the image graphics path
+        swfLocation: path + 'audiojs.swf' // Change the path where the flash plugin is stored
+      };
+
+      audiojs.events.ready(function() {
+        var as = audiojs.createAll(settings);
+      });
+    </script>
+
+
 ## Bugs / Contributions
 
 - [Report a bug](https://github.com/kolber/audiojs/issues)
