@@ -616,6 +616,9 @@
       this.element.load();
       this.mp3 = mp3;
       container[audiojs].events.trackLoadProgress(this);
+      // Remove the error because we load the next song
+      container[audiojs].helpers.removeClass(this.wrapper,
+                                             this.settings.createPlayer.errorClass);
     },
     loadError: function() {
       this.settings.loadError.apply(this);
