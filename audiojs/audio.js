@@ -630,6 +630,8 @@
       this.duration = this.element.duration;
       this.updatePlayhead();
       this.settings.loadStarted.apply(this);
+      
+      return true;
     },
     loadProgress: function() {
       if (this.element.buffered != null && this.element.buffered.length) {
