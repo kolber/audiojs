@@ -244,7 +244,7 @@
         this.injectFlash(audio, id);
         this.attachFlashEvents(audio.wrapper, audio);
       } else if (s.useFlash && !s.hasFlash) {
-        this.settings.flashError.apply(audio);
+        s.flashError.apply(audio);
       }
 
       // Attach event callbacks to the new audiojs instance.
