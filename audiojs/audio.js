@@ -9,6 +9,8 @@
       var path = scripts[i].getAttribute('src');
       if(re.test(path)) return path.replace(re, '');
     }
+    // when no script found, an empty string causes the least confusion.
+    return '';
   })();
   
   // ##The audiojs interface
