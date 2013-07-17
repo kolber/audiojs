@@ -155,9 +155,8 @@
       },
       loadProgress: function(percent) {
         var player = this.settings.createPlayer,
-            scrubber = getByClass(player.scrubberClass, this.wrapper),
             loaded = getByClass(player.loaderClass, this.wrapper);
-        loaded.style.width = (scrubber.offsetWidth * percent) + 'px';
+        loaded.style.width = (100 * percent) + '%';
       },
       playPause: function() {
         if (this.playing) this.settings.play();
@@ -173,9 +172,8 @@
       },
       updatePlayhead: function(percent) {
         var player = this.settings.createPlayer,
-            scrubber = getByClass(player.scrubberClass, this.wrapper),
             progress = getByClass(player.progressClass, this.wrapper);
-        progress.style.width = (scrubber.offsetWidth * percent) + 'px';
+        progress.style.width = (100 * percent) + '%';
 
         var played = getByClass(player.playedClass, this.wrapper),
             p = this.duration * percent,
