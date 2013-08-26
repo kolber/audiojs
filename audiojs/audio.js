@@ -520,9 +520,9 @@
             loadTimer = setInterval(function() {
               audio.loadProgress.apply(audio);
               if (audio.loadedPercent >= 1) clearInterval(loadTimer);
-            });
+            }, 200);
           }
-        }, 10);
+        }, 200);
         audio.readyTimer = readyTimer;
         audio.loadTimer = loadTimer;
       },
