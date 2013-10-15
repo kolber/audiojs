@@ -257,8 +257,12 @@
     // Inject a wrapping div and the markup for the html player.
     createPlayer: function(element, player, id) {
       var wrapper = document.createElement('div'),
-          newElement = element.cloneNode(true);
-      wrapper.setAttribute('class', 'audiojs');
+          newElement = element.cloneNode(true),
+          classes = element.getAttribute('class');
+
+      classes = classes == null ? '' : ' ' + classes;
+
+      wrapper.setAttribute('class', 'audiojs' + classes);
       wrapper.setAttribute('className', 'audiojs');
       wrapper.setAttribute('id', id);
 
