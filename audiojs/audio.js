@@ -206,6 +206,10 @@
           instances = []
           options = options || {};
       for (var i = 0, ii = audioElements.length; i < ii; i++) {
+        
+        if ((" " + audioElements[i].parentNode.className + " ").replace(/[\n\t]/g, " ").indexOf(" audiojs ") > -1)
+          continue;
+          
         instances.push(this.newInstance(audioElements[i], options));
       }
       return instances;
