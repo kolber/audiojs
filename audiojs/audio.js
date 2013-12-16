@@ -34,6 +34,7 @@
       autoplay: false,
       loop: false,
       preload: true,
+      single: false,
       imageLocation: path + 'player-graphics.gif',
       swfLocation: path + 'audiojs.swf',
       useFlash: (function() {
@@ -220,10 +221,11 @@
           wrapperId = 'audiojs_wrapper'+this.instanceCount,
           instanceCount = this.instanceCount++;
 
-      // Check for `autoplay`, `loop` and `preload` attributes and write them into the settings.
+      // Check for `autoplay`, `loop`, `preload` and `single` attributes and write them into the settings.
       if (element.getAttribute('autoplay') != null) s.autoplay = true;
       if (element.getAttribute('loop') != null) s.loop = true;
       if (element.getAttribute('preload') == 'none') s.preload = false;
+      if (element.getAttribute('single') != null) s.single = true;
       // Merge the default settings with the user-defined `options`.
       if (options) this.helpers.merge(s, options);
 
@@ -643,7 +645,14 @@
     },
     playPause: function() {
       if (this.playing) this.pause();
-      else this.play();
+      else {
+        if (this.settings.single) {
+          for (var i = 0; i < container[audiojs].instanceCount; ++i) {
+            container[audiojs].instances['audiojs'+i].pause();
+          }
+        }
+        this.play();
+      }
     },
     play: function() {
       var ios = (/(ipod|iphone|ipad)/i).test(navigator.userAgent);
