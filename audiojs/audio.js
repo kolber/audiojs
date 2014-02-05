@@ -3,12 +3,13 @@
   // Use the path to the audio.js file to create relative paths to the swf and player graphics
   // Remember that some systems (e.g. ruby on rails) append strings like '?1301478336' to asset paths
   var path = (function() {
-    var re = new RegExp('audio(\.min)?\.js.*'),
+    var re = new RegExp('audio(\\.min)?\\.js.*'),
         scripts = document.getElementsByTagName('script');
     for (var i = 0, ii = scripts.length; i < ii; i++) {
       var path = scripts[i].getAttribute('src');
       if(re.test(path)) return path.replace(re, '');
     }
+    return '';
   })();
   
   // ##The audiojs interface
@@ -242,7 +243,7 @@
         this.injectFlash(audio, id);
         this.attachFlashEvents(audio.wrapper, audio);
       } else if (s.useFlash && !s.hasFlash) {
-        this.settings.flashError.apply(audio);
+        s.flashError.apply(audio);
       }
 
       // Attach event callbacks to the new audiojs instance.
@@ -370,7 +371,8 @@
       audio['loadStarted'] = function() {
         // Load the mp3 specified by the audio element into the swf.
         audio.swfReady = true;
-        if (audio.settings.preload) audio.element.init(audio.mp3);
+        if (audio.settings.flashReady) audio.settings.flashReady.apply(audio);
+        if (audio.settings.preload && audio.mp3) audio.element.init(audio.mp3);
         if (audio.settings.autoplay) audio.play.apply(audio);
       }
     },
@@ -628,6 +630,8 @@
       this.duration = this.element.duration;
       this.updatePlayhead();
       this.settings.loadStarted.apply(this);
+      
+      return true;
     },
     loadProgress: function() {
       if (this.element.buffered != null && this.element.buffered.length) {
