@@ -355,13 +355,13 @@
         audio.playing = true;
         // IE doesn't allow a method named `play()` to be exposed through `ExternalInterface`, so lets go with `pplay()`.  
         // <http://dev.nuclearrooster.com/2008/07/27/externalinterfaceaddcallback-can-cause-ie-js-errors-with-certain-keyworkds/>
-        audio.element.pplay();
+        audio.element.play();
         audio.settings.play.apply(audio);
       }
       audio['pause'] = function() {
         audio.playing = false;
         // Use `ppause()` for consistency with `pplay()`, even though it isn't really required.
-        audio.element.ppause();
+        audio.element.pause();
         audio.settings.pause.apply(audio);
       }
       audio['setVolume'] = function(v) {
