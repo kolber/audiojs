@@ -639,6 +639,17 @@
         this.loadedPercent = durationLoaded / this.duration;
 
         this.settings.loadProgress.apply(this, [this.loadedPercent]);
+      }else
+      {
+    		  // audio duration in Android/Firefox
+    		  if (!this.loadStartedCalled) {
+    			  this.loadStartedCalled = this.loadStarted();
+    		  }
+
+      	  var durationLoaded = this.element.buffered.end(this.element.buffered.length - 1);
+          this.loadedPercent = durationLoaded / this.duration;
+
+          this.settings.loadProgress.apply(this, [this.loadedPercent]);
       }
     },
     playPause: function() {
