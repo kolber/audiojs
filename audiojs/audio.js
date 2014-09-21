@@ -10,8 +10,6 @@
       if(re.test(path)) return path.replace(re, '');
     }
   })();
-
-  console.log(path);
   
   // ##The audiojs interface
   // This is the global object which provides an interface for creating new `audiojs` instances.
