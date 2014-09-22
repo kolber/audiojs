@@ -512,7 +512,10 @@
         // For modern browsers use the standard DOM-compliant `createEvent`.
         args = args || {};
         if (document.createEvent) {
-          event = new Event(eventName, args);
+          event = new Event(eventName);
+          for (key in args) {
+            event[key] = args[key];
+          }
           element.dispatchEvent(event);
           // For Internet Explorer, use `fireEvent`.  
         } else if (document.createEventObject) {
