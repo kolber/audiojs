@@ -3,7 +3,7 @@
   // Use the path to the audio.js file to create relative paths to the swf and player graphics
   // Remember that some systems (e.g. ruby on rails) append strings like '?1301478336' to asset paths
   var path = (function() {
-    var re = new RegExp('audio(\.min)?\.js.*'),
+    var re = new RegExp('audio([.]+min)?[.]+js.*'),
         scripts = document.getElementsByTagName('script');
     for (var i = 0, ii = scripts.length; i < ii; i++) {
       var path = scripts[i].getAttribute('src');
@@ -124,7 +124,9 @@
         .error .play-pause p { cursor: auto; } \
         .error .error-message { display: block; }',
       // The default event callbacks:
-      trackEnded: function(e) {},
+      trackEnded: function(e) {
+        container[audiojs].events.triggerEvent(this.wrapper, "trackEnded");
+      },
       flashError: function() {
         var player = this.settings.createPlayer,
             errorMessage = getByClass(player.errorMessageClass, this.wrapper),
@@ -133,6 +135,7 @@
         container[audiojs].helpers.removeClass(this.wrapper, player.loadingClass);
         container[audiojs].helpers.addClass(this.wrapper, player.errorClass);
         errorMessage.innerHTML = html;
+        container[audiojs].events.triggerEvent(this.wrapper, "flashError");
       },
       loadError: function(e) {
         var player = this.settings.createPlayer,
@@ -140,6 +143,7 @@
         container[audiojs].helpers.removeClass(this.wrapper, player.loadingClass);
         container[audiojs].helpers.addClass(this.wrapper, player.errorClass);
         errorMessage.innerHTML = 'Error loading: "'+this.mp3+'"';
+        container[audiojs].events.triggerEvent(this.wrapper, "loadError");
       },
       init: function() {
         var player = this.settings.createPlayer;
@@ -152,23 +156,28 @@
             s = Math.floor(this.duration % 60);
         container[audiojs].helpers.removeClass(this.wrapper, player.loadingClass);
         duration.innerHTML = ((m<10?'0':'')+m+':'+(s<10?'0':'')+s);
+        container[audiojs].events.triggerEvent(this.wrapper, "loadStarted");
       },
       loadProgress: function(percent) {
         var player = this.settings.createPlayer,
             loaded = getByClass(player.loaderClass, this.wrapper);
         loaded.style.width = (100 * percent) + '%';
+        container[audiojs].events.triggerEvent(this.wrapper, "loadProgress", {percent: percent});
       },
       playPause: function() {
         if (this.playing) this.settings.play();
         else this.settings.pause();
+        container[audiojs].events.triggerEvent(this.wrapper, "playPause");
       },
       play: function() {
         var player = this.settings.createPlayer;
         container[audiojs].helpers.addClass(this.wrapper, player.playingClass);
+        container[audiojs].events.triggerEvent(this.wrapper, "play");
       },
       pause: function() {
         var player = this.settings.createPlayer;
         container[audiojs].helpers.removeClass(this.wrapper, player.playingClass);
+        container[audiojs].events.triggerEvent(this.wrapper, "pause");
       },
       updatePlayhead: function(percent) {
         var player = this.settings.createPlayer,
@@ -180,6 +189,7 @@
             m = Math.floor(p / 60),
             s = Math.floor(p % 60);
         played.innerHTML = ((m<10?'0':'')+m+':'+(s<10?'0':'')+s);
+        container[audiojs].events.triggerEvent(this.wrapper, "timeupdate", {percent: percent});
       }
     },
 
@@ -495,6 +505,25 @@
           element.attachEvent('on' + eventName, function() {
             func.call(element, window.event);
           });
+        }
+      },
+
+      triggerEvent: function(element, eventName, args) {
+        // For modern browsers use the standard DOM-compliant `createEvent`.
+        args = args || {};
+        if (document.createEvent) {
+          event = new Event(eventName);
+          for (key in args) {
+            event[key] = args[key];
+          }
+          element.dispatchEvent(event);
+          // For Internet Explorer, use `fireEvent`.  
+        } else if (document.createEventObject) {
+          event = document.createEventObject();
+          for (key in args) {
+            event[key] = args[key];
+          }
+          element.fireEvent('on' + eventName, event);
         }
       },
 
