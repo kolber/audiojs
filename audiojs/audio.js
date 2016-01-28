@@ -35,6 +35,7 @@
       loop: false,
       preload: true,
       imageLocation: path + 'player-graphics.gif',
+      retinaImageLocation: path + 'player-graphics@2x.gif',
       swfLocation: path + 'audiojs.swf',
       useFlash: (function() {
         var a = document.createElement('audio');
@@ -112,6 +113,20 @@
         .audiojs .loading { background: url("$1") -2px -31px no-repeat; } \
         .audiojs .error { background: url("$1") -2px -61px no-repeat; } \
         .audiojs .pause { background: url("$1") -2px -91px no-repeat; } \
+        \
+        @media only screen and (-webkit-min-device-pixel-ratio: 2), \
+          only screen and (min--moz-device-pixel-ratio: 2), \
+          only screen and (min-moz-device-pixel-ratio: 2), \
+          only screen and (-o-min-device-pixel-ratio: 2/1), \
+          only screen and (min-device-pixel-ratio: 2) { \
+            .audiojs .play, .audiojs .loading, .audiojs .error, .audiojs .pause { \
+              background-image: url("$2"); \
+              -webkit-background-size: 30px 120px; \
+              -moz-background-size: 30px 120px; \
+              -o-background-size: 30px 120px; \
+              background-size: 30px 120px; \
+            } \
+        } \
         \
         .playing .play, .playing .loading, .playing .error { display: none; } \
         .playing .pause { display: block; } \
@@ -426,6 +441,7 @@
         var prepend = '',
             styles = document.getElementsByTagName('style'),
             css = string.replace(/\$1/g, audio.settings.imageLocation);
+            css = css.replace(/\$2/g, audio.settings.retinaImageLocation);
 
         for (var i = 0, ii = styles.length; i < ii; i++) {
           var title = styles[i].getAttribute('title');
