@@ -7,7 +7,12 @@
         scripts = document.getElementsByTagName('script');
     for (var i = 0, ii = scripts.length; i < ii; i++) {
       var path = scripts[i].getAttribute('src');
-      if(re.test(path)) return path.replace(re, '');
+      if(re.test(path))
+      {
+        var f = path.split ( '/' );
+        f.pop ();
+        return f.join ( '/' ) + '/';
+      }
     }
     // when no script found, an empty string causes the least confusion.
     return '';
