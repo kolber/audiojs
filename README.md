@@ -64,3 +64,7 @@ directly from the command line. It makes life that little bit less painful.
 Run the following command from within the `audiojs` folder.
 
     mxmlc audiojs.as
+
+### License
+
+audio.js is released under the MIT license. Included MP3 and Ogg files are Creative Commons licensed tracks from [Bensound.com](http://www.bensound.com/)
