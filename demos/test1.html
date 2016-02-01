@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Test 1 - audio.js</title>
+    <style>
+        p { clear: both; }
+    </style>
+    <script src="../audiojs/audio.js"></script>
+    <script>
+        audiojs.events.ready(function() {
+            var as = audiojs.createAll();
+        });
+    </script>
+</head>
+<body>
+<h1>audiojs.createAll()</h1>
+<p>Load from remote URL</p>
+<audio preload="auto">
+    <source src="https://raw.githubusercontent.com/Zetaphor/audiojs/master/mp3/bensound-dubstep.mp3">
+</audio>
+
+<p>Load local file</p>
+<audio preload="auto">
+    <source src="../mp3/bensound-dubstep.mp3">
+</audio>
+
+<p>Load failure (from source)</p>
+<audio preload="auto">
+    <source src="./mp3/invalid.mp3">
+</audio>
+
+<p><a href="http://www.bensound.com/royalty-free-music/track/dubstep">Royalty Free Music from Bensound</a></p>
+</body>
+</html>
