@@ -1,0 +1,29 @@
+{
+  "name": "audiojs",
+  "homepage": "https://kolber.github.io/audiojs/",
+  "authors": [
+    "Gary Daigle <zetaphor@gmail.com>",
+    "Anthony Kolber <ae@aestheticallyloyal.com>"
+  ],
+  "description": "A cross-browser javascript wrapper for the html5 audio tag",
+  "main": "audio.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "audio",
+    "javascript",
+    "html5"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "jquery": "~2.2.0"
+  }
+}
