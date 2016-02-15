@@ -178,7 +178,7 @@
       loadProgress: function(percent) {
         var player = this.settings.createPlayer,
             loaded = getByClass(player.loaderClass, this.wrapper);
-        loaded.style.width = (100 * percent) + '%';
+        loaded.style.width = Math.round(100 * percent) + '%';
       },
       playPause: function() {
         if (this.playing) this.settings.play();
@@ -196,7 +196,7 @@
       updatePlayhead: function(percent) {
         var player = this.settings.createPlayer,
             progress = getByClass(player.progressClass, this.wrapper);
-        progress.style.width = (100 * percent) + '%';
+        progress.style.width = Math.round(100 * percent) + '%';
 
         var played = getByClass(player.playedClass, this.wrapper),
             p = this.duration * percent,
