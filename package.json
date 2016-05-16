@@ -1,0 +1,24 @@
+{
+  "name": "audiojs",
+  "version": "1.0.0",
+  "description": "A cross-browser javascript wrapper for the html5 audio tag",
+  "main": "audiojs/audio.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kolber/audiojs.git"
+  },
+  "keywords": [
+    "audiojs",
+    "audio.js",
+    "html5",
+    "audio",
+    "fallback",
+    "flash"
+  ],
+  "author": "Anthony Kolber",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kolber/audiojs/issues"
+  },
+  "homepage": "https://github.com/kolber/audiojs#readme"
+}
