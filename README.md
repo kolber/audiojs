@@ -64,6 +64,10 @@ directly from the command line. It makes life that little bit less painful.
 Run the following command from within the `audiojs` folder.
 
     mxmlc audiojs.as
+    
+### Bower package
+
+    bower install audiojs
 
 ### License
 
