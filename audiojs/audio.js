@@ -309,21 +309,14 @@
       if (!audio.settings.createPlayer) return;
       var player = audio.settings.createPlayer,
           playPause = getByClass(player.playPauseClass, wrapper),
-          scrubber = getByClass(player.scrubberClass, wrapper),
-          leftPos = function(elem) {
-            var curleft = 0;
-            if (elem.offsetParent) {
-              do { curleft += elem.offsetLeft; } while (elem = elem.offsetParent);
-            }
-            return curleft;
-          };
+          scrubber = getByClass(player.scrubberClass, wrapper);
 
       container[audiojs].events.addListener(playPause, 'click', function(e) {
         audio.playPause.apply(audio);
       });
 
       container[audiojs].events.addListener(scrubber, 'click', function(e) {
-        var relativeLeft = e.clientX - leftPos(this);
+        var relativeLeft = e.clientX - this.getBoundingClientRect().left;
         audio.skipTo(relativeLeft / scrubber.offsetWidth);
       });
 
