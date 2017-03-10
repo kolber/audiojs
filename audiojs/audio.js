@@ -188,6 +188,10 @@
         var player = this.settings.createPlayer;
         container[audiojs].helpers.removeClass(this.wrapper, player.errorClass);
         container[audiojs].helpers.addClass(this.wrapper, player.playingClass);
+        this.settings.onAfterPlay();
+      },
+      onAfterPlay: function() {
+        // to be overridden
       },
       pause: function() {
         var player = this.settings.createPlayer;
@@ -229,10 +233,10 @@
           instances = []
           options = options || {};
       for (var i = 0, ii = audioElements.length; i < ii; i++) {
-        
+
         if ((" " + audioElements[i].parentNode.className + " ").replace(/[\n\t]/g, " ").indexOf(" audiojs ") > -1)
           continue;
-          
+
         instances.push(this.newInstance(audioElements[i], options));
       }
       return instances;
@@ -628,12 +632,15 @@
       this.element.currentTime = this.duration * percent;
       this.updatePlayhead();
     },
-    load: function(mp3) {
+    load: function(mp3, trackid) {
+      // trackid not required, default: ""
+      trackid = typeof trackid !== 'undefined' ? trackid : "";
       this.loadStartedCalled = false;
       this.source.setAttribute('src', mp3);
       // The now outdated `load()` method is required for Safari 4
       this.element.load();
       this.mp3 = mp3;
+      this.trackid = trackid;
       container[audiojs].events.trackLoadProgress(this);
     },
     loadError: function() {
