@@ -245,7 +245,8 @@
           s = this.helpers.clone(this.settings),
           id = 'audiojs'+this.instanceCount,
           wrapperId = 'audiojs_wrapper'+this.instanceCount,
-          instanceCount = this.instanceCount++;
+          instanceCount = this.instanceCount++,
+          durationAttribute = element.getAttribute('data-duration');
 
       // Check for `autoplay`, `loop` and `preload` attributes and write them into the settings.
       if (element.getAttribute('autoplay') != null) s.autoplay = true;
@@ -260,6 +261,18 @@
 
       // Return a new `audiojs` instance.
       var audio = new container[audiojsInstance](element, s);
+
+      if (durationAttribute) {
+        var duration = getByClass(s.createPlayer.durationClass, audio.wrapper);
+        if (/^\d+$/.test(durationAttribute)) {
+          var seconds = parseInt(durationAttribute, 10),
+              s = seconds % 60,
+              m = (seconds - s) / 60;
+          duration.innerHTML = ((m<10?'0':'')+m+':'+(s<10?'0':'')+s);
+        } else {
+          duration.innerHTML = durationAttribute;
+        }
+      }
 
       // If css has been passed in, dynamically inject it into the `<head>`.
       if (s.css) this.helpers.injectCss(audio, s.css);
