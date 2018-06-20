@@ -88,24 +88,31 @@ Screen reader accessibility support has been added for both play/pause and scrub
 
         container[audiojs].events.addListener(playPause, 'keydown', function(e) {
             var prevent = false;
-            
-            if (e.keyCode === space || e.keyCode === enter) {
+    
+            if (e.keyCode === 32 || e.keyCode === 13) {
               audio.playPause.apply(audio);
               prevent = true;
             }
-            
+    
             if (prevent) {
               e.preventDefault();
               e.stopPropagation();
             }
-        }); 
-        
+        });
         
 2. Scrubber:
 
 - ARIA roles and attributes
 
         <div class="scrubber" role="slider" tabindex="0" aria-valuemin="0" aria-valuenow="0" aria-valuemax="0" aria-label="seek">
+        
+- Update ARIA attributes
+
+        scrubber.setAttribute("aria-valuemax", Math.round(this.duration));
+
+        var aria_p = Math.round(p);
+        if (aria_p % 5 === 0) scrubber.setAttribute("aria-valuenow", aria_p);
+       
         
 - Arrow keys down listener
 
@@ -114,16 +121,16 @@ Screen reader accessibility support has been added for both play/pause and scrub
               prevent = false;
     
             switch (e.keyCode) {
-              case pageDown:
-              case left:
-              case down:
+              case 34:
+              case 37:
+              case 40:
                 audio.skipTo((progressLeft - 5) / scrubber.offsetWidth);
                 prevent = true;
                 break;
     
-              case pageUp:
-              case right:
-              case up:
+              case 33:
+              case 39:
+              case 38:
                 audio.skipTo((progressLeft + 5) / scrubber.offsetWidth);
                 prevent = true;
                 break;
