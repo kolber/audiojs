@@ -66,12 +66,12 @@
       createPlayer: {
         markup: '\
           <div class="play-pause"> \
-            <p class="play"></p> \
-            <p class="pause"></p> \
-            <p class="loading"></p> \
-            <p class="error"></p> \
+            <p role="button" tabindex="0" aria-label="play" class="play"></p> \
+            <p role="button" tabindex="0" aria-label="pause" class="pause"></p> \
+            <p class="loading" aria-label="loading"></p> \
+            <p class="error" aria-label="error"></p> \
           </div> \
-          <div class="scrubber"> \
+          <div class="scrubber" role="slider" tabindex="0" aria-valuemin="0" aria-valuenow="0" aria-valuemax="0" aria-label="seek"> \
             <div class="progress"></div> \
             <div class="loaded"></div> \
           </div> \
@@ -99,10 +99,14 @@
           background-image: -moz-linear-gradient(center top, #444 0%, #555 50%, #444 51%, #444 100%); \
           -webkit-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); -moz-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); \
           -o-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); } \
-        .audiojs .play-pause { width: 25px; height: 40px; padding: 4px 6px; margin: 0px; float: left; overflow: hidden; border-right: 1px solid #000; } \
-        .audiojs p { display: none; width: 25px; height: 40px; margin: 0px; cursor: pointer; } \
+        .audiojs .play-pause { width: 25px; height: 25px; padding: 4px 6px; margin: 0px; float: left; overflow: hidden; border-right: 1px solid #000; } \
+        .audiojs p { display: none; width: 25px; height: 25px; margin: 0px; cursor: pointer; outline: none; } \
+        .audiojs p:focus { outline: 2px solid white; } \
+        .audiojs p:hover:focus { outline: none; } \
         .audiojs .play { display: block; } \
-        .audiojs .scrubber { position: relative; float: left; width: 280px; background: #5a5a5a; height: 14px; margin: 10px; border-top: 1px solid #3f3f3f; border-left: 0px; border-bottom: 0px; overflow: hidden; } \
+        .audiojs .scrubber { position: relative; float: left; width: 280px; background: #5a5a5a; height: 14px; margin: 10px; border-top: 1px solid #3f3f3f; border-left: 0px; border-bottom: 0px; overflow: hidden; outline: none } \
+        .audiojs .scrubber:focus { outline: 2px solid white } \
+        .audiojs .scrubber:hover:focus { outline: none; } \
         .audiojs .progress { position: absolute; top: 0px; left: 0px; height: 14px; width: 0px; background: #ccc; z-index: 1; \
           background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ccc), color-stop(0.5, #ddd), color-stop(0.51, #ccc), color-stop(1, #ccc)); \
           background-image: -moz-linear-gradient(center top, #ccc 0%, #ddd 50%, #ccc 51%, #ccc 100%); } \
@@ -170,10 +174,12 @@
       loadStarted: function() {
         var player = this.settings.createPlayer,
             duration = getByClass(player.durationClass, this.wrapper),
+            scrubber = getByClass(player.scrubberClass, this.wrapper),
             m = Math.floor(this.duration / 60),
             s = Math.floor(this.duration % 60);
         container[audiojs].helpers.removeClass(this.wrapper, player.loadingClass);
         duration.innerHTML = ((m<10?'0':'')+m+':'+(s<10?'0':'')+s);
+        scrubber.setAttribute("aria-valuemax", Math.round(this.duration));
       },
       loadProgress: function(percent) {
         var player = this.settings.createPlayer,
@@ -195,7 +201,8 @@
       },
       updatePlayhead: function(percent) {
         var player = this.settings.createPlayer,
-            progress = getByClass(player.progressClass, this.wrapper);
+            progress = getByClass(player.progressClass, this.wrapper),
+            scrubber = getByClass(player.scrubberClass, this.wrapper);
         progress.style.width = Math.round(100 * percent) + '%';
 
         var played = getByClass(player.playedClass, this.wrapper),
@@ -203,6 +210,9 @@
             m = Math.floor(p / 60),
             s = Math.floor(p % 60);
         played.innerHTML = ((m<10?'0':'')+m+':'+(s<10?'0':'')+s);
+
+        var aria_p = Math.round(p);
+        if (aria_p % 5 === 0) scrubber.setAttribute("aria-valuenow", aria_p);
       }
     },
 
@@ -309,15 +319,67 @@
       if (!audio.settings.createPlayer) return;
       var player = audio.settings.createPlayer,
           playPause = getByClass(player.playPauseClass, wrapper),
-          scrubber = getByClass(player.scrubberClass, wrapper);
+          progress = getByClass(player.progressClass, wrapper),
+          scrubber = getByClass(player.scrubberClass, wrapper),
+          left = 37,
+          up = 38,
+          right = 39,
+          down = 40,
+          pageUp = 33,
+          pageDown = 34,
+          space = 32,
+          enter = 13;
 
       container[audiojs].events.addListener(playPause, 'click', function(e) {
         audio.playPause.apply(audio);
       });
 
+      container[audiojs].events.addListener(playPause, 'keydown', function(e) {
+        var prevent = false;
+
+        if (e.keyCode === space || e.keyCode === enter) {
+          audio.playPause.apply(audio);
+          prevent = true;
+        }
+
+        if (prevent) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+
       container[audiojs].events.addListener(scrubber, 'click', function(e) {
         var relativeLeft = e.clientX - this.getBoundingClientRect().left;
         audio.skipTo(relativeLeft / scrubber.offsetWidth);
+      });
+
+      container[audiojs].events.addListener(scrubber, 'keydown', function(e) {
+        var progressLeft = progress.offsetWidth,
+          prevent = false;
+
+        switch (e.keyCode) {
+          case pageDown:
+          case left:
+          case down:
+            audio.skipTo((progressLeft - 5) / scrubber.offsetWidth);
+            prevent = true;
+            break;
+
+          case pageUp:
+          case right:
+          case up:
+            audio.skipTo((progressLeft + 5) / scrubber.offsetWidth);
+            prevent = true;
+            break;
+
+          default:
+            break;
+        }
+
+        if (prevent) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       });
 
       // _If flash is being used, then the following handlers don't need to be registered._

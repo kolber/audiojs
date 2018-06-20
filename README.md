@@ -68,6 +68,81 @@ Run the following command from within the `audiojs` folder.
 ### Bower package
 
     bower install audiojs
+    
+## A11y
+
+Screen reader accessibility support has been added for both play/pause and scrubber.
+
+1. Play/pause:
+
+- Aria roles and labels
+
+        <div class="play-pause"> 
+          <p role="button" tabindex="0" aria-label="play" class="play"></p> 
+          <p role="button" tabindex="0" aria-label="pause" class="pause"></p> 
+          <p class="loading" aria-label="loading"></p> 
+          <p class="error" aria-label="error"></p> 
+        </div> 
+        
+- Enter and space down listener
+
+        container[audiojs].events.addListener(playPause, 'keydown', function(e) {
+            var prevent = false;
+            
+            if (e.keyCode === space || e.keyCode === enter) {
+              audio.playPause.apply(audio);
+              prevent = true;
+            }
+            
+            if (prevent) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+        }); 
+        
+        
+2. Scrubber:
+
+- Aria roles and attributes
+
+        <div class="scrubber" role="slider" tabindex="0" aria-valuemin="0" aria-valuenow="0" aria-valuemax="0" aria-label="seek">
+        
+- Arrow keys down lister
+
+        container[audiojs].events.addListener(scrubber, 'keydown', function(e) {
+            var progressLeft = progress.offsetWidth,
+              prevent = false;
+    
+            switch (e.keyCode) {
+              case pageDown:
+              case left:
+              case down:
+                audio.skipTo((progressLeft - 5) / scrubber.offsetWidth);
+                prevent = true;
+                break;
+    
+              case pageUp:
+              case right:
+              case up:
+                audio.skipTo((progressLeft + 5) / scrubber.offsetWidth);
+                prevent = true;
+                break;
+    
+              default:
+                break;
+            }
+    
+            if (prevent) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+        });
+        
+Also, visual focus for keyboard users:
+
+        .audiojs p:focus { outline: 2px solid white; }
+        .audiojs .scrubber:focus { outline: 2px solid white }
+
 
 ### License
 
