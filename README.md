@@ -75,7 +75,7 @@ Screen reader accessibility support has been added for both play/pause and scrub
 
 1. Play/pause:
 
-- Aria roles and labels
+- ARIA roles and labels
 
         <div class="play-pause"> 
           <p role="button" tabindex="0" aria-label="play" class="play"></p> 
@@ -103,11 +103,11 @@ Screen reader accessibility support has been added for both play/pause and scrub
         
 2. Scrubber:
 
-- Aria roles and attributes
+- ARIA roles and attributes
 
         <div class="scrubber" role="slider" tabindex="0" aria-valuemin="0" aria-valuenow="0" aria-valuemax="0" aria-label="seek">
         
-- Arrow keys down lister
+- Arrow keys down listener
 
         container[audiojs].events.addListener(scrubber, 'keydown', function(e) {
             var progressLeft = progress.offsetWidth,
